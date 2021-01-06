@@ -19,7 +19,7 @@
  */
 MEMORY
 {
-    flash0 (rx) : org = 0x00000000, len = 64k
+    flash0 (rx) : org = 0x00000200, len = 64k - 0x200
     flash1 (rx) : org = 0x00000000, len = 0
     flash2 (rx) : org = 0x00000000, len = 0
     flash3 (rx) : org = 0x00000000, len = 0
