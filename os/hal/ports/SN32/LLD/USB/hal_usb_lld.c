@@ -25,6 +25,7 @@
 #include <SN32F240B.h>
 #include <string.h>
 #include "hal.h"
+#include "usb.h"
 #include "usbhw.h"
 #include "usbuser.h"
 #include "usbram.h"
@@ -142,7 +143,7 @@ static void sn32_usb_read_fifo(usbep_t ep, uint8_t *buf, size_t sz, bool intr) {
 
             data = SN_USB->RWDATA2;
         }
-
+        
         memcpy(buf, &data, chunk);
 
         off += chunk;
@@ -199,7 +200,7 @@ static void sn32_usb_write_fifo(usbep_t ep, const uint8_t *buf, size_t sz, bool 
             SN_USB->RWSTATUS2 = 0x01;
             while (SN_USB->RWSTATUS2 & 0x01);
         }
-
+        
 
         off += chunk;
         buf += chunk;
@@ -278,7 +279,7 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
 			/* IN */
             __USB_CLRINSTS(mskEP0_IN);
 
-            // The address
+            // The address 
             if (address) {
                 SN_USB->ADDR = address;
                 address = 0;
@@ -303,10 +304,10 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
             else
             {
                 USB_EPnAck(USB_EP0,0);
-
+                
                 _usb_isr_invoke_in_cb(usbp, 0);
             }
-
+            
 		}
 		else if (iwIntFlag & mskEP0_OUT)
 		{
@@ -414,9 +415,9 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
             else
             {
                 USB_EPnNak(ep);
-
+                
                 _usb_isr_invoke_in_cb(usbp, ep);
-            }
+            }   
         }
     }
 	else if (iwIntFlag & (mskEP4_NAK|mskEP3_NAK|mskEP2_NAK|mskEP1_NAK))
@@ -465,7 +466,7 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
 
             _usb_isr_invoke_in_cb(usbp, ep);
         }
-
+        
 	}
 
 	/////////////////////////////////////////////////
@@ -827,7 +828,7 @@ void usb_lld_start_in(USBDriver *usbp, usbep_t ep)
     {
         _usb_isr_invoke_in_cb(usbp, ep);
     }
-
+    
 }
 
 /**
