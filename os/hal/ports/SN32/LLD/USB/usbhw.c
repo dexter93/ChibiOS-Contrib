@@ -10,7 +10,7 @@
 #include	"SN32F200_Def.h"
 // #include	"..\type.h"
 // #include	"..\Utility\Utility.h"
-
+#include	<stdint.h>
 #include	"usbram.h"
 #include	"usbhw.h"
 #include	"usbuser.h"
