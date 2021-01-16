@@ -25,7 +25,6 @@
 #include <SN32F240B.h>
 #include <string.h>
 #include "hal.h"
-#include "usb.h"
 #include "usbhw.h"
 #include "usbuser.h"
 #include "usbram.h"
@@ -143,7 +142,7 @@ static void sn32_usb_read_fifo(usbep_t ep, uint8_t *buf, size_t sz, bool intr) {
 
             data = SN_USB->RWDATA2;
         }
-        
+
         memcpy(buf, &data, chunk);
 
         off += chunk;
@@ -200,7 +199,7 @@ static void sn32_usb_write_fifo(usbep_t ep, const uint8_t *buf, size_t sz, bool 
             SN_USB->RWSTATUS2 = 0x01;
             while (SN_USB->RWSTATUS2 & 0x01);
         }
-        
+
 
         off += chunk;
         buf += chunk;
@@ -216,70 +215,74 @@ void rgb_matrix_disable_noeeprom(void);
  */
 static void usb_lld_serve_interrupt(USBDriver *usbp)
 {
-	uint32_t iwIntFlag;
+    uint32_t iwIntFlag;
     size_t n;
 
-	//** Get Interrupt Status and clear immediately.
-	iwIntFlag = SN_USB->INSTS;
-	SN_USB->INSTSC = 0xFEFBFFFF;	//** Don't clear PRESETUP & ERR_SETUP flag
+    //** Get Interrupt Status and clear immediately.
+    iwIntFlag = SN_USB->INSTS;
+    SN_USB->INSTSC = 0xFEFBFFFF;    //** Don't clear PRESETUP & ERR_SETUP flag
 
-	if(iwIntFlag == 0)
-	{
-		//@20160902 add for EMC protection
-		USB_ReturntoNormal();
-		return;
-	}
+    if(iwIntFlag == 0)
+    {
+        //@20160902 add for EMC protection
+        USB_ReturntoNormal();
+        return;
+    }
 
-	/////////////////////////////////////////////////
-	/* Device Status Interrupt (BusReset, Suspend) */
-	/////////////////////////////////////////////////
-	if (iwIntFlag & (mskBUS_RESET | mskBUS_SUSPEND | mskBUS_RESUME))
-	{
-		if (iwIntFlag & mskBUS_RESET)
-		{
-			/* BusReset */
-			USB_ReturntoNormal();
-			USB_ResetEvent();
+    /////////////////////////////////////////////////
+    /* Device Status Interrupt (BusReset, Suspend) */
+    /////////////////////////////////////////////////
+    if (iwIntFlag & (mskBUS_RESET | mskBUS_SUSPEND | mskBUS_RESUME))
+    {
+        if (iwIntFlag & mskBUS_RESET)
+        {
+            /* BusReset */
+            USB_ReturntoNormal();
+            USB_ResetEvent();
             _usb_reset(usbp);
-		}
-		else if (iwIntFlag & mskBUS_SUSPEND)
-		{
-			/* Suspend */
-			USB_SuspendEvent();
+        }
+        else if (iwIntFlag & mskBUS_SUSPEND)
+        {
+            /* Suspend */
+            USB_SuspendEvent();
             _usb_suspend(usbp);
-		}
-		else if(iwIntFlag & mskBUS_RESUME)
-		{
-			/* Resume */
-			USB_ReturntoNormal();
-			USB_ResumeEvent();
+        }
+        else if(iwIntFlag & mskBUS_RESUME)
+        {
+            /* Resume */
+            USB_ReturntoNormal();
+            USB_ResumeEvent();
             _usb_wakeup(usbp);
-		}
-	}
-	/////////////////////////////////////////////////
-	/* Device Status Interrupt (SETUP, IN, OUT) 	 */
-	/////////////////////////////////////////////////
-	else if (iwIntFlag & (mskEP0_SETUP|mskEP0_IN|mskEP0_OUT|mskEP0_IN_STALL|mskEP0_OUT_STALL))
-	{
+        }
+    }
+    /////////////////////////////////////////////////
+    /* Device Status Interrupt (SETUP, IN, OUT)      */
+    /////////////////////////////////////////////////
+    else if (iwIntFlag & (mskEP0_SETUP|mskEP0_IN|mskEP0_OUT|mskEP0_IN_STALL|mskEP0_OUT_STALL))
+    {
         const USBEndpointConfig *epcp = usbp->epc[0];
 
-		if (iwIntFlag & mskEP0_SETUP)
-		{
-			/* SETUP */
+        if (iwIntFlag & mskEP0_SETUP)
+        {
+            /* SETUP */
             __USB_CLRINSTS((mskEP0_SETUP|mskEP0_PRESETUP|mskEP0_OUT_STALL|mskEP0_IN_STALL));
-            //** keep EP0	NAK
+            //** keep EP0   NAK
             USB_EPnNak(USB_EP0);
+
+            epcp->in_state->txcnt  = 0;
+            epcp->in_state->txsize = 0;
+            epcp->in_state->txlast = 0;
+
             _usb_isr_invoke_setup_cb(usbp, 0);
-            USB_EPnAck(USB_EP0, epcp->in_state->txsize);
-		}
-		else if (iwIntFlag & mskEP0_IN)
-		{
+        }
+        else if (iwIntFlag & mskEP0_IN)
+        {
             USBInEndpointState *isp = epcp->in_state;
 
-			/* IN */
+            /* IN */
             __USB_CLRINSTS(mskEP0_IN);
 
-            // The address 
+            // The address
             if (address) {
                 SN_USB->ADDR = address;
                 address = 0;
@@ -297,36 +300,36 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
                 isp->txbuf += isp->txlast;
                 isp->txlast = n;
 
-                USB_EPnAck(USB_EP0, n);
-
                 sn32_usb_write_fifo(0, isp->txbuf, n, true);
+
+                USB_EPnAck(USB_EP0, n);
             }
             else
             {
                 USB_EPnAck(USB_EP0,0);
-                
+
                 _usb_isr_invoke_in_cb(usbp, 0);
             }
-            
-		}
-		else if (iwIntFlag & mskEP0_OUT)
-		{
-			/* OUT */
+
+        }
+        else if (iwIntFlag & mskEP0_OUT)
+        {
+            /* OUT */
             __USB_CLRINSTS(mskEP0_OUT);
             _usb_isr_invoke_out_cb(usbp, 0);
-		}
-		else if (iwIntFlag & (mskEP0_IN_STALL|mskEP0_OUT_STALL))
-		{
-			/* EP0_IN_OUT_STALL */
-			USB_EPnStall(USB_EP0);
+        }
+        else if (iwIntFlag & (mskEP0_IN_STALL|mskEP0_OUT_STALL))
+        {
+            /* EP0_IN_OUT_STALL */
+            USB_EPnStall(USB_EP0);
             SN_USB->INSTSC = (mskEP0_IN_STALL|mskEP0_OUT_STALL);
-		}
-	}
-	/////////////////////////////////////////////////
-	/* Device Status Interrupt (EPnACK) 					 */
-	/////////////////////////////////////////////////
-	else if (iwIntFlag & (mskEP4_ACK|mskEP3_ACK|mskEP2_ACK|mskEP1_ACK))
-	{
+        }
+    }
+    /////////////////////////////////////////////////
+    /* Device Status Interrupt (EPnACK)                      */
+    /////////////////////////////////////////////////
+    else if (iwIntFlag & (mskEP4_ACK|mskEP3_ACK|mskEP2_ACK|mskEP1_ACK))
+    {
         usbep_t ep = USB_EP1;
         uint8_t out = 0;
         uint8_t cnt = 0;
@@ -415,46 +418,46 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
             else
             {
                 USB_EPnNak(ep);
-                
+
                 _usb_isr_invoke_in_cb(usbp, ep);
-            }   
+            }
         }
     }
-	else if (iwIntFlag & (mskEP4_NAK|mskEP3_NAK|mskEP2_NAK|mskEP1_NAK))
-	{
+    else if (iwIntFlag & (mskEP4_NAK|mskEP3_NAK|mskEP2_NAK|mskEP1_NAK))
+    {
         usbep_t ep = USB_EP1;
         uint8_t out = 0;
         //uint8_t cnt = 0;
 
         // Determine the interrupting endpoint, direction, and clear the interrupt flag
-		if (iwIntFlag & mskEP1_NAK)
-		{
+        if (iwIntFlag & mskEP1_NAK)
+        {
             __USB_CLRINSTS(mskEP1_NAK);
             ep = USB_EP1;
             out = ( SN_USB->CFG & mskEP1_DIR ) == mskEP1_DIR;
             //cnt = SN_USB->EP1CTL & mskEPn_CNT;
-		}
-		if (iwIntFlag & mskEP2_NAK)
-		{
+        }
+        if (iwIntFlag & mskEP2_NAK)
+        {
             __USB_CLRINSTS(mskEP2_NAK);
             ep = USB_EP2;
             out = ( SN_USB->CFG & mskEP2_DIR ) == mskEP2_DIR;
             //cnt = SN_USB->EP2CTL & mskEPn_CNT;
-		}
-		if (iwIntFlag & mskEP3_NAK)
-		{
+        }
+        if (iwIntFlag & mskEP3_NAK)
+        {
             __USB_CLRINSTS(mskEP3_NAK);
             ep = USB_EP3;
             out = ( SN_USB->CFG & mskEP3_DIR ) == mskEP3_DIR;
             //cnt = SN_USB->EP3CTL & mskEPn_CNT;
-		}
-		if (iwIntFlag & mskEP4_NAK)
-		{
+        }
+        if (iwIntFlag & mskEP4_NAK)
+        {
             __USB_CLRINSTS(mskEP4_NAK);
             ep = USB_EP4;
             out = ( SN_USB->CFG & mskEP4_DIR ) == mskEP4_DIR;
             //cnt = SN_USB->EP4CTL & mskEPn_CNT;
-		}
+        }
 
         if(out)
         {
@@ -466,18 +469,18 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
 
             _usb_isr_invoke_in_cb(usbp, ep);
         }
-        
-	}
 
-	/////////////////////////////////////////////////
-	/* Device Status Interrupt (SOF) 							 */
-	/////////////////////////////////////////////////
-	if ((iwIntFlag & mskUSB_SOF) && (SN_USB->INTEN & mskUSB_SOF_IE))
-	{
-		/* SOF */
-		USB_SOFEvent();
+    }
+
+    /////////////////////////////////////////////////
+    /* Device Status Interrupt (SOF)                             */
+    /////////////////////////////////////////////////
+    if ((iwIntFlag & mskUSB_SOF) && (SN_USB->INTEN & mskUSB_SOF_IE))
+    {
+        /* SOF */
+        USB_SOFEvent();
         _usb_isr_invoke_sof_cb(usbp);
-	}
+    }
 }
 
 /*===========================================================================*/
@@ -828,7 +831,7 @@ void usb_lld_start_in(USBDriver *usbp, usbep_t ep)
     {
         _usb_isr_invoke_in_cb(usbp, ep);
     }
-    
+
 }
 
 /**
