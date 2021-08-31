@@ -102,6 +102,21 @@ uint32_t FLASH_ProgramPage (uint32_t adr, uint32_t sz, uint8_t *pBuf)
 }
 
 /*****************************************************************************
+* Function		: FLASH_ProgramHalfWord
+* Description	: Program a half word at a specified address
+* Input			: adr - Page start address (word-alignment) of Flash
+*				  		pBuf - pointer to the Source data
+* Output		: None
+* Return		: OK or FAIL
+* Note			: None
+*****************************************************************************/
+uint32_t FLASH_ProgramHalfWord(uint32_t adr, uint8_t *pBuf) {
+    uint32_t status = FLASH_ProgramPage(adr, 2, pBuf);
+
+    return status;
+}
+
+/*****************************************************************************
 * Function		: FLASH_Checksum
 * Description	: Calculate Checksum in Flash ROM
 * Input			: None
