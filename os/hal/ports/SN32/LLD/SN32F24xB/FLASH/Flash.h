@@ -23,7 +23,7 @@
 #define FLASH_BUSY										0x00000001
 #define FLASH_ERR										0x00000004
 
-#define	FLASH_WAIT_FOR_DONE		while (SN_FLASH->STATUS & FLASH_BUSY) {__nop();}
+#define	FLASH_WAIT_FOR_DONE		while (SN_FLASH->STATUS & FLASH_BUSY) {__asm__("NOP");}
 
 
 /*_____ M A C R O S ________________________________________________________*/
