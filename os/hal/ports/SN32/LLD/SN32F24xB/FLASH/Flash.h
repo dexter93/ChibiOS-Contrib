@@ -36,13 +36,14 @@
 //Flash Status
 #define	__FLASH_CLEAR_ERROR_STATUS	SN_FLASH->STATUS &= ~FLASH_PGERR
 
-
 /*_____ D E C L A R A T I O N S ____________________________________________*/
 extern	uint32_t wFLASH_PGRAM[2];
+typedef enum { FLASH_FAIL, FLASH_OKAY} FLASH_Status;
 
 void FLASH_MassErase (void);
-void FLASH_EraseSector (uint32_t);
-uint32_t FLASH_ProgramPage (uint32_t, uint32_t, uint8_t *);
+FLASH_Status FLASH_EraseSector (uint32_t);
+FLASH_Status FLASH_ProgramPage (uint32_t, uint32_t, uint16_t);
+FLASH_Status FLASH_ProgramHalfWord(uint32_t, uint16_t);
 uint16_t FLASH_Checksum(void);
 
 #endif	/* __SN32F240B_FLASH_H */

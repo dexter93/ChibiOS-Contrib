@@ -40,7 +40,7 @@ uint32_t wFLASH_PGRAM[2];
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void FLASH_EraseSector (uint32_t adr)
+FLASH_Status FLASH_EraseSector (uint32_t adr)
 {
  	SN_FLASH->CTRL = FLASH_PER;						// Page Erase Enabled
 	SN_FLASH->ADDR = adr;									// Page Address
@@ -50,6 +50,8 @@ void FLASH_EraseSector (uint32_t adr)
 	SN_FLASH->CTRL |= FLASH_START;				// Start Erase
 
 	FLASH_WAIT_FOR_DONE
+
+	return (FLASH_OKAY);
 }
 
 
@@ -58,34 +60,35 @@ void FLASH_EraseSector (uint32_t adr)
 * Description	: Program assigned page in Flash ROM
 * Input			: adr - Page start address (word-alignment) of Flash
 *				  		sz - Content size to be programmed (Bytes)
-*				  		pBuf - pointer to the Source data
+*				  		Data - the Source data
 * Output		: None
-* Return		: OK or FAIL
+* Return		: FLASH_OKAY or FLASH_FAIL
 * Note			: None
 *****************************************************************************/
-uint32_t FLASH_ProgramPage (uint32_t adr, uint32_t sz, uint8_t *pBuf)
+FLASH_Status FLASH_ProgramPage (uint32_t adr, uint32_t sz, uint16_t Data)
 {
 	SN_FLASH->CTRL = FLASH_PG;                  // Programming Enabled
 	SN_FLASH->ADDR = adr;
 
 	FLASH_WAIT_FOR_DONE
 	
+	*(uint32_t*)adr = Data;
+	
 	while (sz){
 
-		SN_FLASH->DATA = *((uint32_t *)pBuf);
+		SN_FLASH->DATA = *((uint32_t *)adr);
 
 		FLASH_WAIT_FOR_DONE
 
 		// Go to next Word
-		//adr += 4;
-		pBuf += 4;
+		adr += 4;
 		sz  -= 4;
 	}
 	
 	// Check for Errors
 	if ((SN_FLASH->STATUS & FLASH_ERR) == FLASH_ERR) {
 		SN_FLASH->STATUS = 0;
-		return (FAIL);
+		return (FLASH_FAIL);
 	}
 
 	SN_FLASH->CTRL |= FLASH_START;				// Start Program
@@ -95,23 +98,23 @@ uint32_t FLASH_ProgramPage (uint32_t adr, uint32_t sz, uint8_t *pBuf)
 	// Check for Errors
 	if ((SN_FLASH->STATUS & FLASH_ERR) == FLASH_ERR) {
 		SN_FLASH->STATUS = 0;
-		return (FAIL);
+		return (FLASH_FAIL);
 	}
 
-	return (OK);
+	return (FLASH_OKAY);
 }
 
 /*****************************************************************************
 * Function		: FLASH_ProgramHalfWord
 * Description	: Program a half word at a specified address
 * Input			: adr - Page start address (word-alignment) of Flash
-*				  		pBuf - pointer to the Source data
+*				  		Data - the Source data
 * Output		: None
-* Return		: OK or FAIL
+* Return		: FLASH_OKAY or FLASH_ERR
 * Note			: None
 *****************************************************************************/
-uint32_t FLASH_ProgramHalfWord(uint32_t adr, uint8_t *pBuf) {
-    uint32_t status = FLASH_ProgramPage(adr, 2, pBuf);
+FLASH_Status FLASH_ProgramHalfWord(uint32_t adr, uint16_t Data) {
+    FLASH_Status status = FLASH_ProgramPage(adr, 2, Data);
 
     return status;
 }
