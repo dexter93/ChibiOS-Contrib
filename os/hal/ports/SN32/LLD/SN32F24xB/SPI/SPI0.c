@@ -26,13 +26,19 @@
 
 
 /*_____ D E F I N I T I O N S ______________________________________________*/
-
+#ifndef   SPI_TEST_CNT
+#define		SPI_TEST_CNT		32
+#endif
+uint16_t	hwSPI_Tx_Fifo[SPI_TEST_CNT];
+uint16_t	hwSPI_Rx_Fifo[SPI_TEST_CNT];
 
 /*_____ M A C R O S ________________________________________________________*/
 
 
 /*_____ F U N C T I O N S __________________________________________________*/
-
+uint32_t	wSPI_NBytes = 0;
+uint32_t  wSPI_Send_Pointer = 0;
+uint32_t  wSPI_Get_Pointer = 0;
 /*****************************************************************************
 * Function		: SPI0_Init
 * Description	: Initialization of SPI0
@@ -134,4 +140,29 @@ void	SPI0_NvicDisable (void)
 {
 	NVIC_DisableIRQ(SPI0_IRQn);
 }
+/*****************************************************************************
+* Function		: SPI0_IRQHandler
+* Description	: None
+* Input			: None
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_IRQHandler(void)
+{
+	__SPI0_CLR_SEL0;										//SEL is low
 
+	SN_SPI0->DATA = hwSPI_Tx_Fifo[wSPI_Send_Pointer++];
+			
+	if(!(SN_SPI0->STAT & mskSPI_RX_EMPTY))		//Check having any data in RXFIFO
+	{	
+		hwSPI_Rx_Fifo[wSPI_Get_Pointer++] = SN_SPI0->DATA;
+	}	
+	
+	if(wSPI_Send_Pointer == wSPI_NBytes)
+	{
+		SN_SPI0->IE_b.TXFIFOTHIE = SPI_TXFIFOTHIE_DIS;	//TX FIFO threshold interrupt disable
+	}		
+
+	SN_SPI0->IC = mskSPI_TXFIFOTHIC;	//Clear overFlow flag
+}

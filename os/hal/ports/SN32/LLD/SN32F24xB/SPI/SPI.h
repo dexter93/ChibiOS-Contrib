@@ -174,6 +174,7 @@ extern void SPI0_Enable(void);
 extern void SPI0_Disable(void);
 extern void	SPI0_NvicEnable (void);
 extern void	SPI0_NvicDisable (void);
+extern void SPI0_IRQHandler(void);
 
 #endif	/*__SN32F240B_SPI_H*/
 
