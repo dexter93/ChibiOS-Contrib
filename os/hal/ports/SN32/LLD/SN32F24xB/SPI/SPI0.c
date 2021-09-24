@@ -20,7 +20,6 @@
 /*_____ I N C L U D E S ____________________________________________________*/
 #include <SN32F240B.h>
 #include "SPI.h"
-#include "..\..\Utility\Utility.h"
 
 
 /*_____ D E C L A R A T I O N S ____________________________________________*/
@@ -69,12 +68,7 @@ void SPI0_Init(void)
 	//SPI0 Fifo reset
 	__SPI0_FIFO_RESET;
 	
-	//SPI0 interrupt enable
-	//SPI0_InterruptEnable();
-	NVIC_ClearPendingIRQ(SPI0_IRQn);	
-	NVIC_EnableIRQ(SPI0_IRQn);
-	//NVIC_SetPriority(SPI0_IRQn,0);
-	
+  SPI0_NvicEnable();	
 	//__SPI0_DATA_FETCH_HIGH_SPEED;									//Enable if Freq. of SCK > 6MHz
 
 	//SPI0 enable	
@@ -112,5 +106,32 @@ void SPI0_Disable(void)
 
 	//Disable HCLK for SPI0
 	SN_SYS1->AHBCLKEN &=~ (0x1 << 12);							//Disable clock for SPI0.
+}
+/*****************************************************************************
+* Function		: SPI0_NvicEnable
+* Description	: Enable SPI0 interrupt
+* Input			: None
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void	SPI0_NvicEnable (void)
+{
+	NVIC_ClearPendingIRQ(SPI0_IRQn);
+	NVIC_EnableIRQ(SPI0_IRQn);
+	//NVIC_SetPriority(SPI0,0);			// Set interrupt priority (default)
+}
+
+/*****************************************************************************
+* Function		: SPI0_NvicDisable
+* Description	: Enable SPI0 interrupt
+* Input			: None
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void	SPI0_NvicDisable (void)
+{
+	NVIC_DisableIRQ(SPI0_IRQn);
 }
 

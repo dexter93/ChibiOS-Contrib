@@ -172,6 +172,8 @@ Base Address: 0x4001 C000 (SPI0)
 extern void SPI0_Init(void);
 extern void SPI0_Enable(void);
 extern void SPI0_Disable(void);
+extern void	SPI0_NvicEnable (void);
+extern void	SPI0_NvicDisable (void);
 
 #endif	/*__SN32F240B_SPI_H*/
 
