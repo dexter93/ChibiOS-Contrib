@@ -31,7 +31,6 @@
 #endif
 uint16_t	hwSPI_Tx_Fifo[SPI_TEST_CNT];
 uint16_t	hwSPI_Rx_Fifo[SPI_TEST_CNT];
-
 /*_____ M A C R O S ________________________________________________________*/
 
 
@@ -113,6 +112,50 @@ void SPI0_Disable(void)
 	//Disable HCLK for SPI0
 	SN_SYS1->AHBCLKEN &=~ (0x1 << 12);							//Disable clock for SPI0.
 }
+
+/*****************************************************************************
+* Function		: SPI0_Write
+* Description	: SPI0 Write buffer
+* Input			: None
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_Write(unsigned char *p, int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        // while (!SN_SPI0->STAT_b.TX_EMPTY);
+        while (SN_SPI0->STAT_b.TX_FULL);
+        SN_SPI0->DATA_b.Data = *p++;
+    }
+    
+    while (SN_SPI0->STAT_b.BUSY);
+}
+
+/*****************************************************************************
+* Function		: SPI0_Read3
+* Description	: SPI0 Read 3 bytes
+* Input			: None
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_Read3(unsigned char b1, unsigned char b2, unsigned char *b3)
+{
+    /* write first 2 bytes: header and address */
+    while (!SN_SPI0->STAT_b.TX_EMPTY);
+    SN_SPI0->DATA_b.Data = b1;
+    SN_SPI0->DATA_b.Data = b2;
+
+    /* read 1 byte data */
+    while (SN_SPI0->STAT_b.BUSY);
+    while (SN_SPI0->STAT_b.RX_EMPTY);
+    *b3 = SN_SPI0->DATA_b.Data;
+         
+    while (SN_SPI0->STAT_b.BUSY);
+}
+
 /*****************************************************************************
 * Function		: SPI0_NvicEnable
 * Description	: Enable SPI0 interrupt
@@ -140,6 +183,7 @@ void	SPI0_NvicDisable (void)
 {
 	NVIC_DisableIRQ(SPI0_IRQn);
 }
+
 /*****************************************************************************
 * Function		: SPI0_IRQHandler
 * Description	: None
@@ -151,9 +195,7 @@ void	SPI0_NvicDisable (void)
 void SPI0_IRQHandler(void)
 {
 	__SPI0_CLR_SEL0;										//SEL is low
-
 	SN_SPI0->DATA = hwSPI_Tx_Fifo[wSPI_Send_Pointer++];
-			
 	if(!(SN_SPI0->STAT & mskSPI_RX_EMPTY))		//Check having any data in RXFIFO
 	{	
 		hwSPI_Rx_Fifo[wSPI_Get_Pointer++] = SN_SPI0->DATA;
@@ -165,4 +207,80 @@ void SPI0_IRQHandler(void)
 	}		
 
 	SN_SPI0->IC = mskSPI_TXFIFOTHIC;	//Clear overFlow flag
+}
+
+/*****************************************************************************
+* Function		: SPI0_NBytesTxRxIrp
+* Description	:  
+* Input			: hwSPI_Tx_Fifo, 
+* Output		: hwSPI_Rx_Fifo
+* Return		: None
+* Note			: Avoid all of the interrupts which may make FW can't fill in TX FIFO (SN_SPI0->DATA=...) in time.
+*****************************************************************************/
+void SPI0_NBytesTxRxIrp(uint32_t N_Bytes)
+{
+	wSPI_NBytes = N_Bytes; 
+
+	SN_SPI0->IE_b.TXFIFOTHIE = SPI_TXFIFOTHIE_EN;
+
+	while(wSPI_Send_Pointer != wSPI_NBytes);	
+
+	while(1)
+	{
+		while(SN_SPI0->STAT & mskSPI_RX_EMPTY); //Get all remaining data				
+		
+		hwSPI_Rx_Fifo[wSPI_Get_Pointer++] = SN_SPI0->DATA;
+			
+		if(wSPI_Get_Pointer == wSPI_NBytes)
+		{
+			break;
+		}
+	}
+
+	__SPI0_SET_SEL0;										//SEL is high
+
+	//Reset Variable
+	wSPI_Send_Pointer = 0;
+	wSPI_Get_Pointer = 0;
+}
+
+
+/***************************************************************************************************************
+* Function		: SIP0_NBytesTxRx
+* Description	:
+* Input			: hwSPI_Tx_Fifo
+* Output		: hwSPI_Rx_Fifo
+* Return		: None
+* Note			: Avoid all of the interrupts which may make FW can't fill in TX FIFO (SN_SPI0->DATA=...) in time.
+***************************************************************************************************************/
+void SPI0_NBytesTxRx(uint32_t N_Bytes)
+{
+	uint32_t  wSPI_Send_Pointer = 0;
+	uint32_t  wSPI_Get_Pointer = 0;
+
+	while(wSPI_Send_Pointer != N_Bytes)
+	{
+		__SPI0_CLR_SEL0;																			//SEL is low
+		SN_SPI0->DATA = hwSPI_Tx_Fifo[wSPI_Send_Pointer++];
+		while (!(SN_SPI0->STAT & mskSPI_TXFIFOTHF));	//TX Half-Empty
+		if(!(SN_SPI0->STAT & mskSPI_RX_EMPTY))								//Check having any data in RXFIFO
+		{	
+			hwSPI_Rx_Fifo[wSPI_Get_Pointer++] = SN_SPI0->DATA;
+		}
+	}	
+
+	while(1)
+	{
+		while(SN_SPI0->STAT & mskSPI_RX_EMPTY); //Get all remaining data
+		hwSPI_Rx_Fifo[wSPI_Get_Pointer++] = SN_SPI0->DATA;
+
+		if(wSPI_Get_Pointer == N_Bytes)
+		{
+			break;
+		}
+	}
+	while(SN_SPI0->STAT & mskSPI_BUSY);
+
+	__SPI0_SET_SEL0;										//SEL is high
+	__SPI0_FIFO_RESET;
 }
