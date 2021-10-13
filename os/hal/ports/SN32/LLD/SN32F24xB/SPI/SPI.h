@@ -101,8 +101,9 @@ Base Address: 0x4001 C000 (SPI0)
 
 /* SPI n Clock Divider register <SPIn_CLKDIV> (0x08) */
 																		//[7:0]SPIn clock divider
+#ifndef SPI_DIV
 #define	SPI_DIV  								6		//MCLK/n,MCLK=system clk  n = 2, 4, 6, 8, ...,512
-
+#endif
 
 /* SPI n Status register <SPIn_STAT> (0x0C) */
 #define mskSPI_TX_EMPTY					(0x1<<0)		//TX FIFO empty flag
@@ -167,6 +168,12 @@ Base Address: 0x4001 C000 (SPI0)
 //SPI Data Fetch speed (High: SCK>6MHz)
 #define	__SPI0_DATA_FETCH_HIGH_SPEED	(SN_SPI0->DF = SPI_DF_EN)		//*(volatile unsigned long *)(0x4001C020) = 1
 
+#ifndef SPI_TX_FIFO_THRESHOLD
+#define SPI_TX_FIFO_THRESHOLD		0
+#endif
+#ifndef SPI_RX_FIFO_THRESHOLD
+#define SPI_RX_FIFO_THRESHOLD		0
+#endif
 
 /*_____ D E C L A R A T I O N S ____________________________________________*/
 extern void SPI0_Init(void);

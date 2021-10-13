@@ -62,6 +62,32 @@ void SPI0_Init(void)
 	SN_SPI0->CTRL0_b.LOOPBACK = SPI_LOOPBACK_DIS; 	//Loop back mode
 	SN_SPI0->CTRL0_b.SDODIS = SPI_SDODIS_EN; 				//Slave data output 
 															//(ONLY used in slave mode)
+	switch(SPI_TX_FIFO_THRESHOLD)
+	{
+		case 0: SN_SPI0->CTRL0_b.TXFIFOTH = SPI_TXFIFOTH_0; break;
+		case 1: SN_SPI0->CTRL0_b.TXFIFOTH = SPI_TXFIFOTH_1; break;
+		case 2: SN_SPI0->CTRL0_b.TXFIFOTH = SPI_TXFIFOTH_2; break;
+		case 3: SN_SPI0->CTRL0_b.TXFIFOTH = SPI_TXFIFOTH_3; break;
+		case 4: SN_SPI0->CTRL0_b.TXFIFOTH = SPI_TXFIFOTH_4; break;
+		case 5: SN_SPI0->CTRL0_b.TXFIFOTH = SPI_TXFIFOTH_5; break;
+		case 6: SN_SPI0->CTRL0_b.TXFIFOTH = SPI_TXFIFOTH_6; break;
+		case 7: SN_SPI0->CTRL0_b.TXFIFOTH = SPI_TXFIFOTH_7; break;
+		default: break;
+	}
+
+	switch(SPI_RX_FIFO_THRESHOLD)
+	{
+		case 0: SN_SPI0->CTRL0_b.RXFIFOTH = SPI_RXFIFOTH_0; break;
+		case 1: SN_SPI0->CTRL0_b.RXFIFOTH = SPI_RXFIFOTH_1; break;
+		case 2: SN_SPI0->CTRL0_b.RXFIFOTH = SPI_RXFIFOTH_2; break;
+		case 3: SN_SPI0->CTRL0_b.RXFIFOTH = SPI_RXFIFOTH_3; break;
+		case 4: SN_SPI0->CTRL0_b.RXFIFOTH = SPI_RXFIFOTH_4; break;
+		case 5: SN_SPI0->CTRL0_b.RXFIFOTH = SPI_RXFIFOTH_5; break;
+		case 6: SN_SPI0->CTRL0_b.RXFIFOTH = SPI_RXFIFOTH_6; break;
+		case 7: SN_SPI0->CTRL0_b.RXFIFOTH = SPI_RXFIFOTH_7; break;
+		default: break;
+	}
+
 																									
 	SN_SPI0->CLKDIV_b.DIV = (SPI_DIV/2) - 1;				//SPIn clock divider
 
