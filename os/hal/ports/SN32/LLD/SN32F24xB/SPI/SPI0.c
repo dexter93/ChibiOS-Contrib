@@ -53,28 +53,33 @@ void SPI0_Init(void)
 
 	//SPI0 setting
 	SN_SPI0->CTRL0_b.DL = SPI_DL_8;									//3 ~ 16 Data length
+#ifdef SPI_MASTER_MODE	
 	SN_SPI0->CTRL0_b.MS = SPI_MS_MASTER_MODE;				//Master/Slave selection bit
+#endif
+#ifdef SPI_SLAVE_MODE
+    SN_SPI0->CTRL0_b.MS             = SPI_MS_SLAVE_MODE;
+#endif
 	SN_SPI0->CTRL0_b.LOOPBACK = SPI_LOOPBACK_DIS; 	//Loop back mode
 	SN_SPI0->CTRL0_b.SDODIS = SPI_SDODIS_EN; 				//Slave data output 
-																									//(ONLY used in slave mode)
+															//(ONLY used in slave mode)
 																									
 	SN_SPI0->CLKDIV_b.DIV = (SPI_DIV/2) - 1;				//SPIn clock divider
 
 	//SPI0 SPI mode
 	SN_SPI0->CTRL1 = mskSPI_CPHA_FALLING_EDGE|					//Clock phase for edge sampling
-									 mskSPI_CPOL_SCK_IDLE_LOW|					//Clock polarity selection bit
-									 mskSPI_MLSB_MSB;									//MSB/LSB selection bit
+									 mskSPI_CPOL_SCK_IDLE_LOW|	//Clock polarity selection bit
+									 mskSPI_MLSB_MSB;			//MSB/LSB selection bit
 
 	//SPI0 SEL0 setting
 	SN_SPI0->CTRL0_b.SELDIS = SPI_SELDIS_DIS; 			//Auto-SEL disable bit
-	SN_GPIO2->MODE_b.MODE9=1;											//SEL(P2.9) is outout high
+	SN_GPIO2->MODE_b.MODE9=1;							//SEL(P2.9) is outout high
 	__SPI0_SET_SEL0;
 
 	//SPI0 Fifo reset
 	__SPI0_FIFO_RESET;
 	
-  SPI0_NvicEnable();	
-	//__SPI0_DATA_FETCH_HIGH_SPEED;									//Enable if Freq. of SCK > 6MHz
+	SPI0_NvicEnable();	
+	//__SPI0_DATA_FETCH_HIGH_SPEED;						/Enable if Freq. of SCK > 6MHz
 
 	//SPI0 enable	
 	SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_EN;    			//SPI enable bit	
@@ -91,9 +96,9 @@ void SPI0_Init(void)
 void SPI0_Enable(void)
 {
 	//Enable HCLK for SPI0
-	SN_SYS1->AHBCLKEN |= (0x1 << 12);								//Enable clock for SPI0.
+	SN_SYS1->AHBCLKEN |= (0x1 << 12);					//Enable clock for SPI0.
 
-  SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_EN;    			//SPI enable bit
+	SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_EN;    			//SPI enable bit
 	__SPI0_FIFO_RESET;
 }
 
@@ -107,53 +112,10 @@ void SPI0_Enable(void)
 *****************************************************************************/
 void SPI0_Disable(void)
 {
-  SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_DIS;    		//SPI disable bit
+	SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_DIS;    		//SPI disable bit
 
 	//Disable HCLK for SPI0
-	SN_SYS1->AHBCLKEN &=~ (0x1 << 12);							//Disable clock for SPI0.
-}
-
-/*****************************************************************************
-* Function		: SPI0_Write
-* Description	: SPI0 Write buffer
-* Input			: None
-* Output		: None
-* Return		: None
-* Note			: None
-*****************************************************************************/
-void SPI0_Write(unsigned char *p, int len)
-{
-    for (int i = 0; i < len; i++)
-    {
-        // while (!SN_SPI0->STAT_b.TX_EMPTY);
-        while (SN_SPI0->STAT_b.TX_FULL);
-        SN_SPI0->DATA_b.Data = *p++;
-    }
-    
-    while (SN_SPI0->STAT_b.BUSY);
-}
-
-/*****************************************************************************
-* Function		: SPI0_Read3
-* Description	: SPI0 Read 3 bytes
-* Input			: None
-* Output		: None
-* Return		: None
-* Note			: None
-*****************************************************************************/
-void SPI0_Read3(unsigned char b1, unsigned char b2, unsigned char *b3)
-{
-    /* write first 2 bytes: header and address */
-    while (!SN_SPI0->STAT_b.TX_EMPTY);
-    SN_SPI0->DATA_b.Data = b1;
-    SN_SPI0->DATA_b.Data = b2;
-
-    /* read 1 byte data */
-    while (SN_SPI0->STAT_b.BUSY);
-    while (SN_SPI0->STAT_b.RX_EMPTY);
-    *b3 = SN_SPI0->DATA_b.Data;
-         
-    while (SN_SPI0->STAT_b.BUSY);
+	SN_SYS1->AHBCLKEN &=~ (0x1 << 12);					//Disable clock for SPI0.
 }
 
 /*****************************************************************************
@@ -194,7 +156,7 @@ void	SPI0_NvicDisable (void)
 *****************************************************************************/
 void SPI0_IRQHandler(void)
 {
-	__SPI0_CLR_SEL0;										//SEL is low
+	__SPI0_CLR_SEL0;							//SEL is low
 	SN_SPI0->DATA = hwSPI_Tx_Fifo[wSPI_Send_Pointer++];
 	if(!(SN_SPI0->STAT & mskSPI_RX_EMPTY))		//Check having any data in RXFIFO
 	{	
@@ -237,7 +199,7 @@ void SPI0_NBytesTxRxIrp(uint32_t N_Bytes)
 		}
 	}
 
-	__SPI0_SET_SEL0;										//SEL is high
+	__SPI0_SET_SEL0;	//SEL is high
 
 	//Reset Variable
 	wSPI_Send_Pointer = 0;
@@ -260,10 +222,10 @@ void SPI0_NBytesTxRx(uint32_t N_Bytes)
 
 	while(wSPI_Send_Pointer != N_Bytes)
 	{
-		__SPI0_CLR_SEL0;																			//SEL is low
+		__SPI0_CLR_SEL0;								//SEL is low
 		SN_SPI0->DATA = hwSPI_Tx_Fifo[wSPI_Send_Pointer++];
 		while (!(SN_SPI0->STAT & mskSPI_TXFIFOTHF));	//TX Half-Empty
-		if(!(SN_SPI0->STAT & mskSPI_RX_EMPTY))								//Check having any data in RXFIFO
+		if(!(SN_SPI0->STAT & mskSPI_RX_EMPTY))			//Check having any data in RXFIFO
 		{	
 			hwSPI_Rx_Fifo[wSPI_Get_Pointer++] = SN_SPI0->DATA;
 		}
@@ -281,6 +243,6 @@ void SPI0_NBytesTxRx(uint32_t N_Bytes)
 	}
 	while(SN_SPI0->STAT & mskSPI_BUSY);
 
-	__SPI0_SET_SEL0;										//SEL is high
+	__SPI0_SET_SEL0;	//SEL is high
 	__SPI0_FIFO_RESET;
 }

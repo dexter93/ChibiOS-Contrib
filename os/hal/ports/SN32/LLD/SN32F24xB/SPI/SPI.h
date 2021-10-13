@@ -3,7 +3,7 @@
 
 
 /*_____ I N C L U D E S ____________________________________________________*/
-
+#include <stdint.h>
 /*_____ D E F I N I T I O N S ______________________________________________*/
 /*
 Base Address: 0x4001 C000 (SPI0)
@@ -172,8 +172,6 @@ Base Address: 0x4001 C000 (SPI0)
 extern void SPI0_Init(void);
 extern void SPI0_Enable(void);
 extern void SPI0_Disable(void);
-extern void SPI0_Write(unsigned char *p, int len);
-extern void SPI0_Read3(unsigned char b1, unsigned char b2, unsigned char *b3);
 extern void	SPI0_NvicEnable (void);
 extern void	SPI0_NvicDisable (void);
 extern void SPI0_IRQHandler(void);
