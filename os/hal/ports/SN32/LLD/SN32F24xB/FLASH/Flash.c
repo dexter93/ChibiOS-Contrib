@@ -45,11 +45,13 @@ FLASH_Status FLASH_EraseSector (uint32_t adr)
  	SN_FLASH->CTRL = FLASH_PER;						// Page Erase Enabled
 	SN_FLASH->ADDR = adr;									// Page Address
 
+	syssts_t sts = chSysGetStatusAndLockX(void);
 	FLASH_WAIT_FOR_DONE
 	
 	SN_FLASH->CTRL |= FLASH_START;				// Start Erase
 
 	FLASH_WAIT_FOR_DONE
+	chSysRestoreStatusX(sts);
 
 	return (FLASH_OKAY);
 }
@@ -73,8 +75,9 @@ FLASH_Status FLASH_ProgramPage (uint32_t adr, uint32_t sz, uint32_t Data)
 	SN_FLASH->CTRL = FLASH_PG;                  // Programming Enabled
 	SN_FLASH->ADDR = adr;
 
+	syssts_t sts = chSysGetStatusAndLockX(void);
 	FLASH_WAIT_FOR_DONE
-	
+
 	*(uint32_t*)adr = Data;
 	
 	while (sz) {
@@ -97,6 +100,7 @@ FLASH_Status FLASH_ProgramPage (uint32_t adr, uint32_t sz, uint32_t Data)
 	SN_FLASH->CTRL |= FLASH_START;				// Start Program
 
 	FLASH_WAIT_FOR_DONE
+	chSysRestoreStatusX(sts);
 
 	// Check for Errors
 	if ((SN_FLASH->STATUS & FLASH_ERR) == FLASH_ERR) {
