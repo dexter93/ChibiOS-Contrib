@@ -216,6 +216,40 @@
  */
 #define VAL_GPIOD_MODE (PIN_MODE_INPUT(GPIOD_PIN3) | PIN_MODE_INPUT(GPIOD_PIN4) | PIN_MODE_INPUT(GPIOD_PIN5) | PIN_MODE_INPUT(GPIOD_PIN6) | PIN_MODE_INPUT(GPIOD_PIN7) | PIN_MODE_INPUT(GPIOD_PIN8) | PIN_MODE_INPUT(GPIOD_PIN9) | PIN_MODE_INPUT(GPIOD_PIN10) | PIN_MODE_INPUT(GPIOD_PIN11))
 
+/* PWM configuration structure. We use timer CT16B1 with 24 channels. */
+static const PWMConfig pwmcfg = {
+    3000000,        /* 3 MHz PWM clock frequency. */
+    100,            /* PWM period is 100 cycles. */
+    0,
+    {
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0},
+        {PWM_OUTPUT_ACTIVE_HIGH, 0}
+    },
+    0
+};
+
 #if !defined(_FROM_ASM_)
 #    ifdef __cplusplus
 extern "C" {
