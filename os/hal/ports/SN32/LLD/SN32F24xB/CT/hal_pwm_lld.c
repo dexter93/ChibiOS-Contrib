@@ -145,240 +145,240 @@ void pwm_lld_start(PWMDriver *pwmp) {
   pwmctrl = 0;
   pwmctrl2 = 0;
   switch (pwmp->config->channels[0].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM0MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM0MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[1].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM1MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM1MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[2].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM2MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM2MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[3].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM3MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM3MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[4].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM4MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM4MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[5].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM5MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM5MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[6].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM6MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM6MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[7].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM7MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM7MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[8].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM8MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM8MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[9].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM9MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM9MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[10].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM10MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM10MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[11].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM11MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM11MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[12].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM12MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM12MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[13].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM13MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM13MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[14].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM14MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM14MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[15].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl |= CT16_PWM15MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl |= CT16_PWM15MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[16].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= CT16_PWM16MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl2 |= CT16_PWM16MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[17].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= CT16_PWM17MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl2 |= CT16_PWM17MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[18].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= CT16_PWM18MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl2 |= CT16_PWM18MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[19].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= CT16_PWM19MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl2 |= CT16_PWM19MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[20].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= CT16_PWM20MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl2 |= CT16_PWM20MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[21].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= CT16_PWM21MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl2 |= CT16_PWM21MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[22].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= CT16_PWM22MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl2 |= CT16_PWM22MODE_2;
     /* Falls through.*/
   default:
     ;
   }
   switch (pwmp->config->channels[23].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
+  case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= CT16_PWM23MODE_1;
     /* Falls through.*/
-  case PWM_OUTPUT_ACTIVE_HIGH:
+  case PWM_OUTPUT_ACTIVE_LOW:
     pwmctrl2 |= CT16_PWM23MODE_2;
     /* Falls through.*/
   default:
