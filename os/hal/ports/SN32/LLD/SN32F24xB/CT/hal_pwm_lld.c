@@ -468,7 +468,7 @@ void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
  * @notapi
  */
 void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
-  pwmp->ct->MCTRL3 = (mskCT16_MR24IE_EN | mskCT16_MR24STOP_EN);
+  pwmp->ct->MCTRL3 = mskCT16_MR24IE_EN;
 }
 
 /**
