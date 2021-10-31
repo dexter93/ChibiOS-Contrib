@@ -36,7 +36,7 @@
 /**
  * @brief   Number of PWM channels per PWM driver.
  */
-#define PWM_CHANNELS                            24
+#define PWM_CHANNELS                 SN32_CT16B1_CHANNELS
 
 /** @} */
 

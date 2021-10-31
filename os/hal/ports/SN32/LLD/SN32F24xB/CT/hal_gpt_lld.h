@@ -83,7 +83,7 @@
 #endif
 
 #if !defined(SN32_HAS_CT16B1)
-#define SN32_HAS_CT16B0                      FALSE
+#define SN32_HAS_CT16B1                      FALSE
 #endif
 
 #if SN32_GPT_USE_CT16B0 && !SN32_HAS_CT16B0

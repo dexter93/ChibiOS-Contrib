@@ -386,7 +386,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
   }
 
   pwmp->ct->PWMCTRL  = pwmctrl;
-  pwmp->ct->PWMCTRL  = pwmctrl2;
+  pwmp->ct->PWMCTRL2  = pwmctrl2;
   pwmp->ct->IC       = 1;                   /* Clear pending IRQs.          */
 
   /* Timer configured and started.*/
@@ -437,6 +437,7 @@ void pwm_lld_enable_channel(PWMDriver *pwmp,
 
   /* Changing channel duty cycle on the fly.*/
   pwmp->ct->MRchannel = width;
+  pwmp->ct->PWMIOENB |= mskCT16_PWMchannelIOEN_EN;
 }
 
 /**
@@ -453,7 +454,7 @@ void pwm_lld_enable_channel(PWMDriver *pwmp,
  */
 void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
 
-  pwmp->ct->MRchannel = 0;
+  pwmp->ct->MRchannelIC;
   pwmp->ct->PWMIOENB |= mskCT16_PWMchannelIOEN_DIS;
 }
 
@@ -467,7 +468,7 @@ void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
  * @notapi
  */
 void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
-  /* Not supported */
+  pwmp->ct->MCTRL3 = (mskCT16_MR24IE_EN | mskCT16_MR24STOP_EN);
 }
 
 /**
@@ -480,7 +481,7 @@ void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
  * @notapi
  */
 void pwm_lld_disable_periodic_notification(PWMDriver *pwmp) {
-  /* Not supported */
+  pwmp->ct->IC = mskCT16_MR24IC;
 }
 
 /**
@@ -496,7 +497,13 @@ void pwm_lld_disable_periodic_notification(PWMDriver *pwmp) {
  */
 void pwm_lld_enable_channel_notification(PWMDriver *pwmp,
                                          pwmchannel_t channel) {
-  /* Not supported */
+  if(channel < 10){
+    pwmp->ct->MCTRL |= mskCT16_MRchannelIE_EN;
+  } else if (channel <20){
+    pwmp->ct->MCTRL2 |= mskCT16_MRchannelIE_EN;
+  } else {
+    pwmp->ct->MCTRL3 |= mskCT16_MRchannelIE_EN;
+  }
 }
 
 /**
@@ -512,7 +519,13 @@ void pwm_lld_enable_channel_notification(PWMDriver *pwmp,
  */
 void pwm_lld_disable_channel_notification(PWMDriver *pwmp,
                                           pwmchannel_t channel) {
-  /* Not supported */
+  if(channel < 10){
+    pwmp->ct->MCTRL |= mskCT16_MRchannelIE_DIS;
+  } else if (channel <20){
+    pwmp->ct->MCTRL2 |= mskCT16_MRchannelIE_DIS;
+  } else {
+    pwmp->ct->MCTRL3 |= mskCT16_MRchannelIE_DIS;
+  }
 }
 
 /**

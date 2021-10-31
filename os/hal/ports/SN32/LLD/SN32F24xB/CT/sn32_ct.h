@@ -36,7 +36,7 @@
  */
 #define SN32_CT16B0       ((sn32_ct_t *)SN_CT16B0_BASE)
 #define SN32_CT16B1       ((sn32_ct_t *)SN_CT16B1_BASE)
-
+#define SN32_CT16B1_CHANNELS        24
 /** @} */
 
 /*===========================================================================*/
