@@ -44,48 +44,47 @@
 /*===========================================================================*/
 
 
-#if HAL_USE_GPT || HAL_USE_PWM || defined(__DOXYGEN__)
-/**
- * @brief   CT16B0 interrupt handler.
- *
- * @isr
- */
-OSAL_IRQ_HANDLER(Vector7C) {
-
-  OSAL_IRQ_PROLOGUE();
-
-#if HAL_USE_GPT
-#if SN32_GPT_USE_CT16B0
-  gpt_lld_serve_interrupt(&GPTD1);
-#endif
-#endif
-  OSAL_IRQ_EPILOGUE();
-}
-
-/**
- * @brief   CT16B1 interrupt handler.
- *
- * @isr
- */
-OSAL_IRQ_HANDLER(Vector80) {
-
-  OSAL_IRQ_PROLOGUE();
-
-#if HAL_USE_GPT
-#if SN32_GPT_USE_CT16B1
-  gpt_lld_serve_interrupt(&GPTD2);
-#endif
-#endif
-#if HAL_USE_PWM
-#if SN32_PWM_USE_CT16B1
-  pwm_lld_serve_interrupt(&PWMD1);
-#endif
-#endif
-
-  OSAL_IRQ_EPILOGUE();
-}
-#endif /* HAL_USE_GPT || HAL_USE_PWM */
-
+//#if HAL_USE_GPT || HAL_USE_PWM || defined(__DOXYGEN__)
+///**
+// * @brief   CT16B0 interrupt handler.
+// *
+// * @isr
+// */
+//OSAL_IRQ_HANDLER(Vector7C) {
+//
+//  OSAL_IRQ_PROLOGUE();
+//
+//#if HAL_USE_GPT
+//#if SN32_GPT_USE_CT16B0
+//  gpt_lld_serve_interrupt(&GPTD1);
+//#endif
+//#endif
+//  OSAL_IRQ_EPILOGUE();
+//}
+//
+///**
+// * @brief   CT16B1 interrupt handler.
+// *
+// * @isr
+// */
+//OSAL_IRQ_HANDLER(Vector80) {
+//
+//  OSAL_IRQ_PROLOGUE();
+//
+//#if HAL_USE_GPT
+//#if SN32_GPT_USE_CT16B1
+//  gpt_lld_serve_interrupt(&GPTD2);
+//#endif
+//#endif
+//#if HAL_USE_PWM
+//#if SN32_PWM_USE_CT16B1
+//  pwm_lld_serve_interrupt(&PWMD1);
+//#endif
+//#endif
+//
+//  OSAL_IRQ_EPILOGUE();
+//}
+//#endif /* HAL_USE_GPT || HAL_USE_PWM */
 /*===========================================================================*/
 /* Driver exported functions.                                                */
 /*===========================================================================*/
