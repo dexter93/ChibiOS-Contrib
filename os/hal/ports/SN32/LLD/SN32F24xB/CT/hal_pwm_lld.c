@@ -142,7 +142,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
                 ((psc + 1) * pwmp->config->frequency) == pwmp->clock,
                 "invalid frequency");
   pwmp->ct->PRE  = psc;
-  pwmp->ct->CT   = pwmp->period - 1;
+  pwmp->ct->PC   = pwmp->period - 1;
 
   /* PFPA - Map all PWM outputs to their PWM A pins */
   SN_PFPA->CT16B1 = 0x00000000;
@@ -476,8 +476,106 @@ void pwm_lld_enable_channel(PWMDriver *pwmp,
                             pwmcnt_t width) {
 
   /* Changing channel duty cycle on the fly.*/
-  pwmp->ct->MRchannel = width;
-  pwmp->ct->PWMIOENB |= mskCT16_PWMchannelIOEN_EN;
+  switch(channel){
+    case 0:
+      pwmp->ct->MR0 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM0IOEN_EN;
+      break;
+    case 1:
+      pwmp->ct->MR1 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM1IOEN_EN;
+      break;
+    case 2:
+      pwmp->ct->MR2 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM2IOEN_EN;
+      break;
+    case 3:
+      pwmp->ct->MR3 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM3IOEN_EN;
+      break;
+    case 4:
+      pwmp->ct->MR4 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM4IOEN_EN;
+      break;
+    case 5:
+      pwmp->ct->MR5 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM5IOEN_EN;
+      break;
+    case 6:
+      pwmp->ct->MR6 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM6IOEN_EN;
+      break;
+    case 7:
+      pwmp->ct->MR7 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM7IOEN_EN;
+      break;
+    case 8:
+      pwmp->ct->MR8 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM8IOEN_EN;
+      break;
+    case 9:
+      pwmp->ct->MR9 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM9IOEN_EN;
+      break;
+    case 10:
+      pwmp->ct->MR10 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM10IOEN_EN;
+      break;
+    case 11:
+      pwmp->ct->MR11 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM11IOEN_EN;
+      break;
+    case 12:
+      pwmp->ct->MR12 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM12IOEN_EN;
+      break;
+    case 13:
+      pwmp->ct->MR13 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM13IOEN_EN;
+      break;
+    case 14:
+      pwmp->ct->MR14 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM14IOEN_EN;
+      break;
+    case 15:
+      pwmp->ct->MR15 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM15IOEN_EN;
+      break;
+    case 16:
+      pwmp->ct->MR16 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM16IOEN_EN;
+      break;
+    case 17:
+      pwmp->ct->MR17 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM17IOEN_EN;
+      break;
+    case 18:
+      pwmp->ct->MR18 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM18IOEN_EN;
+      break;
+    case 19:
+      pwmp->ct->MR19 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM19IOEN_EN;
+      break;
+    case 20:
+      pwmp->ct->MR20 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM20IOEN_EN;
+      break;
+    case 21:
+      pwmp->ct->MR21 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM21IOEN_EN;
+      break;
+    case 22:
+      pwmp->ct->MR22 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM22IOEN_EN;
+      break;
+    case 23:
+      pwmp->ct->MR23 = width;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM23IOEN_EN;
+      break;
+    default:
+      ;
+  }
 }
 
 /**
@@ -494,8 +592,106 @@ void pwm_lld_enable_channel(PWMDriver *pwmp,
  */
 void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
 
-  pwmp->ct->MRchannelIC;
-  pwmp->ct->PWMIOENB |= mskCT16_PWMchannelIOEN_DIS;
+  switch(channel){
+    case 0:
+      pwmp->ct->IC |= mskCT16_MR0IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM0IOEN_DIS;
+      break;
+    case 1:
+      pwmp->ct->IC |= mskCT16_MR1IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM1IOEN_DIS;
+      break;
+    case 2:
+      pwmp->ct->IC |= mskCT16_MR2IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM2IOEN_DIS;
+      break;
+    case 3:
+      pwmp->ct->IC |= mskCT16_MR3IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM3IOEN_DIS;
+      break;
+    case 4:
+      pwmp->ct->IC |= mskCT16_MR4IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM4IOEN_DIS;
+      break;
+    case 5:
+      pwmp->ct->IC |= mskCT16_MR5IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM5IOEN_DIS;
+      break;
+    case 6:
+      pwmp->ct->IC |= mskCT16_MR6IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM6IOEN_DIS;
+      break;
+    case 7:
+      pwmp->ct->IC |= mskCT16_MR7IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM7IOEN_DIS;
+      break;
+    case 8:
+      pwmp->ct->IC |= mskCT16_MR8IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM8IOEN_DIS;
+      break;
+    case 9:
+      pwmp->ct->IC |= mskCT16_MR9IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM9IOEN_DIS;
+      break;
+    case 10:
+      pwmp->ct->IC |= mskCT16_MR10IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM10IOEN_DIS;
+      break;
+    case 11:
+      pwmp->ct->IC |= mskCT16_MR11IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM11IOEN_DIS;
+      break;
+    case 12:
+      pwmp->ct->IC |= mskCT16_MR12IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM12IOEN_DIS;
+      break;
+    case 13:
+      pwmp->ct->IC |= mskCT16_MR13IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM13IOEN_DIS;
+      break;
+    case 14:
+      pwmp->ct->IC |= mskCT16_MR14IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM14IOEN_DIS;
+      break;
+    case 15:
+      pwmp->ct->IC |= mskCT16_MR15IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM15IOEN_DIS;
+      break;
+    case 16:
+      pwmp->ct->IC |= mskCT16_MR16IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM16IOEN_DIS;
+      break;
+    case 17:
+      pwmp->ct->IC |= mskCT16_MR17IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM17IOEN_DIS;
+      break;
+    case 18:
+      pwmp->ct->IC |= mskCT16_MR18IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM18IOEN_DIS;
+      break;
+    case 19:
+      pwmp->ct->IC |= mskCT16_MR19IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM19IOEN_DIS;
+      break;
+    case 20:
+      pwmp->ct->IC |= mskCT16_MR20IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM20IOEN_DIS;
+      break;
+    case 21:
+      pwmp->ct->IC |= mskCT16_MR21IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM21IOEN_DIS;
+      break;
+    case 22:
+      pwmp->ct->IC |= mskCT16_MR22IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM22IOEN_DIS;
+      break;
+    case 23:
+      pwmp->ct->IC |= mskCT16_MR23IC;
+      pwmp->ct->PWMIOENB |= mskCT16_PWM23IOEN_DIS;
+      break;
+    default:
+      ;
+  }
 }
 
 /**
@@ -509,7 +705,7 @@ void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
  */
 void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
   pwmp->ct->MR24 = pwmp->period - 1;
-  pwmp->ct->MCTRL3 = mskCT16_MR24IE_EN;
+  pwmp->ct->MCTRL3 |= mskCT16_MR24IE_EN;
 }
 
 /**
@@ -522,7 +718,7 @@ void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
  * @notapi
  */
 void pwm_lld_disable_periodic_notification(PWMDriver *pwmp) {
-  pwmp->ct->IC = mskCT16_MR24IC;
+  pwmp->ct->IC |= mskCT16_MR24IC;
 }
 
 /**
@@ -538,12 +734,81 @@ void pwm_lld_disable_periodic_notification(PWMDriver *pwmp) {
  */
 void pwm_lld_enable_channel_notification(PWMDriver *pwmp,
                                          pwmchannel_t channel) {
-  if(channel < 10){
-    pwmp->ct->MCTRL |= mskCT16_MRchannelIE_EN;
-  } else if (channel <20){
-    pwmp->ct->MCTRL2 |= mskCT16_MRchannelIE_EN;
-  } else {
-    pwmp->ct->MCTRL3 |= mskCT16_MRchannelIE_EN;
+  switch(channel){
+    case 0:
+      pwmp->ct->MCTRL |= mskCT16_MR0IE_EN;
+      break;
+    case 1:
+      pwmp->ct->MCTRL |= mskCT16_MR1IE_EN;
+      break;
+    case 2:
+      pwmp->ct->MCTRL |= mskCT16_MR2IE_EN;
+      break;
+    case 3:
+      pwmp->ct->MCTRL |= mskCT16_MR3IE_EN;
+      break;
+    case 4:
+      pwmp->ct->MCTRL |= mskCT16_MR4IE_EN;
+      break;
+    case 5:
+      pwmp->ct->MCTRL |= mskCT16_MR5IE_EN;
+      break;
+    case 6:
+      pwmp->ct->MCTRL |= mskCT16_MR6IE_EN;
+      break;
+    case 7:
+      pwmp->ct->MCTRL |= mskCT16_MR7IE_EN;
+      break;
+    case 8:
+      pwmp->ct->MCTRL |= mskCT16_MR8IE_EN;
+      break;
+    case 9:
+      pwmp->ct->MCTRL |= mskCT16_MR9IE_EN;
+      break;
+    case 10:
+      pwmp->ct->MCTRL2 |= mskCT16_MR10IE_EN;
+      break;
+    case 11:
+      pwmp->ct->MCTRL2 |= mskCT16_MR11IE_EN;
+      break;
+    case 12:
+      pwmp->ct->MCTRL2 |= mskCT16_MR12IE_EN;
+      break;
+    case 13:
+      pwmp->ct->MCTRL2 |= mskCT16_MR13IE_EN;
+      break;
+    case 14:
+      pwmp->ct->MCTRL2 |= mskCT16_MR14IE_EN;
+      break;
+    case 15:
+      pwmp->ct->MCTRL2 |= mskCT16_MR15IE_EN;
+      break;
+    case 16:
+      pwmp->ct->MCTRL2 |= mskCT16_MR16IE_EN;
+      break;
+    case 17:
+      pwmp->ct->MCTRL2 |= mskCT16_MR17IE_EN;
+      break;
+    case 18:
+      pwmp->ct->MCTRL2 |= mskCT16_MR18IE_EN;
+      break;
+    case 19:
+      pwmp->ct->MCTRL2 |= mskCT16_MR19IE_EN;
+      break;
+    case 20:
+      pwmp->ct->MCTRL3 |= mskCT16_MR20IE_EN;
+      break;
+    case 21:
+      pwmp->ct->MCTRL3 |= mskCT16_MR21IE_EN;
+      break;
+    case 22:
+      pwmp->ct->MCTRL3 |= mskCT16_MR22IE_EN;
+      break;
+    case 23:
+      pwmp->ct->MCTRL3 |= mskCT16_MR23IE_EN;
+      break;
+    default:
+      ;
   }
 }
 
@@ -560,14 +825,82 @@ void pwm_lld_enable_channel_notification(PWMDriver *pwmp,
  */
 void pwm_lld_disable_channel_notification(PWMDriver *pwmp,
                                           pwmchannel_t channel) {
-  if(channel < 10){
-    pwmp->ct->MCTRL |= mskCT16_MRchannelIE_DIS;
-  } else if (channel <20){
-    pwmp->ct->MCTRL2 |= mskCT16_MRchannelIE_DIS;
-  } else {
-    pwmp->ct->MCTRL3 |= mskCT16_MRchannelIE_DIS;
-  }
-}
+  switch(channel){
+    case 0:
+      pwmp->ct->MCTRL |= mskCT16_MR0IE_DIS;
+      break;
+    case 1:
+      pwmp->ct->MCTRL |= mskCT16_MR1IE_DIS;
+      break;
+    case 2:
+      pwmp->ct->MCTRL |= mskCT16_MR2IE_DIS;
+      break;
+    case 3:
+      pwmp->ct->MCTRL |= mskCT16_MR3IE_DIS;
+      break;
+    case 4:
+      pwmp->ct->MCTRL |= mskCT16_MR4IE_DIS;
+      break;
+    case 5:
+      pwmp->ct->MCTRL |= mskCT16_MR5IE_DIS;
+      break;
+    case 6:
+      pwmp->ct->MCTRL |= mskCT16_MR6IE_DIS;
+      break;
+    case 7:
+      pwmp->ct->MCTRL |= mskCT16_MR7IE_DIS;
+      break;
+    case 8:
+      pwmp->ct->MCTRL |= mskCT16_MR8IE_DIS;
+      break;
+    case 9:
+      pwmp->ct->MCTRL |= mskCT16_MR9IE_DIS;
+      break;
+    case 10:
+      pwmp->ct->MCTRL2 |= mskCT16_MR10IE_DIS;
+      break;
+    case 11:
+      pwmp->ct->MCTRL2 |= mskCT16_MR11IE_DIS;
+      break;
+    case 12:
+      pwmp->ct->MCTRL2 |= mskCT16_MR12IE_DIS;
+      break;
+    case 13:
+      pwmp->ct->MCTRL2 |= mskCT16_MR13IE_DIS;
+      break;
+    case 14:
+      pwmp->ct->MCTRL2 |= mskCT16_MR14IE_DIS;
+      break;
+    case 15:
+      pwmp->ct->MCTRL2 |= mskCT16_MR15IE_DIS;
+      break;
+    case 16:
+      pwmp->ct->MCTRL2 |= mskCT16_MR16IE_DIS;
+      break;
+    case 17:
+      pwmp->ct->MCTRL2 |= mskCT16_MR17IE_DIS;
+      break;
+    case 18:
+      pwmp->ct->MCTRL2 |= mskCT16_MR18IE_DIS;
+      break;
+    case 19:
+      pwmp->ct->MCTRL2 |= mskCT16_MR19IE_DIS;
+      break;
+    case 20:
+      pwmp->ct->MCTRL3 |= mskCT16_MR20IE_DIS;
+      break;
+    case 21:
+      pwmp->ct->MCTRL3 |= mskCT16_MR21IE_DIS;
+      break;
+    case 22:
+      pwmp->ct->MCTRL3 |= mskCT16_MR22IE_DIS;
+      break;
+    case 23:
+      pwmp->ct->MCTRL3 |= mskCT16_MR23IE_DIS;
+      break;
+    default:
+      ;
+  }}
 
 /**
  * @brief   Common CT IRQ handler.
@@ -655,7 +988,7 @@ void pwm_lld_serve_interrupt(PWMDriver *pwmp) {
   if (((ris & mskCT16_MR23IF) != 0) &&
       (pwmp->config->channels[23].callback != NULL))
     pwmp->config->channels[23].callback(pwmp);
-  if (((ris & gptp->ct->IC) != 0) && (pwmp->config->callback != NULL))
+  if (((ris & pwmp->ct->IC) != 0) && (pwmp->config->callback != NULL))
     pwmp->config->callback(pwmp);
 }
 
