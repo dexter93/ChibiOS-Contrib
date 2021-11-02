@@ -135,6 +135,11 @@ typedef struct {
    */
   pwmcallback_t             callback;
   /* End of the mandatory fields.*/
+  /**
+   * @brief CT16 PFPA register initialization data.
+   * @note  The value of this field should normally be equal to zero.
+   */
+  uint8_t                  pfpamsk;
 } PWMChannelConfig;
 
 /**

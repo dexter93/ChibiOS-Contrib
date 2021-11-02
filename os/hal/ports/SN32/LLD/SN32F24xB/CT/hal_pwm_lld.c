@@ -141,6 +141,15 @@ void pwm_lld_start(PWMDriver *pwmp) {
   pwmp->ct->PRE  = psc;
   pwmp->ct->CT   = pwmp->period - 1;
 
+  /* PFPA - Map all PWM outputs to their PWM A pins */
+  SN_PFPA->CT16B1 = 0x00000000;
+  /* PFPA assignment for PWM B-pin mapping.*/
+  for(i=0; i<24; i++){
+    if(pwmp->config->channels[i].pfpamsk != 0) {
+      SN_PFPA->CT16B1 |= (1<<i);
+    }
+  }
+
   /* Output enables and polarities setup.*/
   pwmctrl = 0;
   pwmctrl2 = 0;
