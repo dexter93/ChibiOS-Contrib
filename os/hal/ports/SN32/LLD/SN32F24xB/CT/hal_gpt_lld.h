@@ -63,14 +63,14 @@
  * @brief   GPTD1 interrupt priority level setting.
  */
 #if !defined(SN32_GPT_CT16B0_IRQ_PRIORITY) || defined(__DOXYGEN__)
-#define SN32_GPT_CT16B0_IRQ_PRIORITY         7
+#define SN32_GPT_CT16B0_IRQ_PRIORITY         3
 #endif
 
 /**
  * @brief   GPTD2 interrupt priority level setting.
  */
 #if !defined(SN32_GPT_CT16B1_IRQ_PRIORITY) || defined(__DOXYGEN__)
-#define SN32_GPT_CT16B1_IRQ_PRIORITY         7
+#define SN32_GPT_CT16B1_IRQ_PRIORITY         3
 #endif
 /** @} */
 
