@@ -147,7 +147,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
   /* PFPA - Map all PWM outputs to their PWM A pins */
   SN_PFPA->CT16B1 = 0x00000000;
   /* PFPA assignment for PWM B-pin mapping.*/
-  for(i=0; i<24; i++){
+  for(uint8_t i=0; i<24; i++){
     if(pwmp->config->channels[i].pfpamsk != 0) {
       SN_PFPA->CT16B1 |= (1<<i);
     }
