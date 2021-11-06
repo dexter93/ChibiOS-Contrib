@@ -219,7 +219,7 @@ void gpt_lld_stop(GPTDriver *gptp) {
 void gpt_lld_start_timer(GPTDriver *gptp, gptcnt_t interval) {
 
   gptp->ct->PC = (uint8_t)(interval - 1U);    /* Time constant.           */
-  gptp->ct->TC = 0;                           /* Reset counter.           */
+  gptp->ct->TMRCTRL = mskCT16_CRST;           /* Reset counter.           */
   gptp->ct->IC = 1;                           /* Clear pending IRQs.      */
   gptp->ct->TMRCTRL |= mskCT16_CEN_EN;
 }
