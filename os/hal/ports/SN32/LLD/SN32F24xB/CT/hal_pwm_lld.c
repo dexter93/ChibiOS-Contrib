@@ -138,11 +138,10 @@ void pwm_lld_start(PWMDriver *pwmp) {
 
   /* Timer configuration.*/
   psc = (pwmp->clock / pwmp->config->frequency) - 1;
-  osalDbgAssert((psc <= 0xFFFF) &&     /* Prescaler calulation.             */
+  osalDbgAssert((psc <= 0xFF) &&     /* Prescaler calculation.             */
                 ((psc + 1) * pwmp->config->frequency) == pwmp->clock,
                 "invalid frequency");
   pwmp->ct->PRE  = psc;
-  pwmp->ct->PC   = pwmp->period - 1;
 
   /* PFPA - Map all PWM outputs to their PWM A pins */
   SN_PFPA->CT16B1 = 0x00000000;
