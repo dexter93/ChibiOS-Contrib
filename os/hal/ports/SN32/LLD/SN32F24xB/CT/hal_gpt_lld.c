@@ -143,7 +143,7 @@ void gpt_lld_start(GPTDriver *gptp) {
 #if SN32_GPT_USE_CT16B0
     if (&GPTD1 == gptp) {
       CT16B0_Init();
-      CT16B0_Reset();
+      CT16B0_ResetTimer();
 #if !defined(SN32_CT16B0_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B0_NUMBER, SN32_GPT_CT16B0_IRQ_PRIORITY);
 #endif
@@ -154,7 +154,7 @@ void gpt_lld_start(GPTDriver *gptp) {
 #if SN32_GPT_USE_CT16B1
     if (&GPTD2 == gptp) {
       CT16B1_Init();
-      CT16B1_Reset();
+      CT16B1_ResetTimer();
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B1_NUMBER, SN32_GPT_CT16B1_IRQ_PRIORITY);
 #endif

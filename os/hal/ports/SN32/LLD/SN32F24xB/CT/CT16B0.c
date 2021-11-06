@@ -58,14 +58,14 @@ void CT16B0_Init (void)
 	//SN_SYS1->APBCP0_b.CT16B0PRE = 0x04;						//PCLK = HCLK/16
 }
 /*****************************************************************************
-* Function		: CT16B0_Reset
+* Function		: CT16B0_ResetTimer
 * Description	: Reset of CT16B0 timer
 * Input			: None
 * Output		: None
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void CT16B0_Reset (void)
+void CT16B0_ResetTimer (void)
 {
 	//Set CT16B0 as the up-counting mode.
 	SN_CT16B0->TMRCTRL = (mskCT16_CRST);

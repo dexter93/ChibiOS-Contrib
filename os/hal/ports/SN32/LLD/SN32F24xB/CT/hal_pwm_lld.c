@@ -115,7 +115,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
 #if SN32_PWM_USE_CT16B1
     if (&PWMD1 == pwmp) {
       CT16B1_Init();
-      CT16B1_Reset();
+      CT16B1_ResetTimer();
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B1_NUMBER, SN32_PWM_CT16B1_IRQ_PRIORITY);
 #endif

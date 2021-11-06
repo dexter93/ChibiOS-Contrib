@@ -59,14 +59,14 @@ void	CT16B1_Init (void)
 }
 
 /*****************************************************************************
-* Function		: CT16B1_Reset
+* Function		: CT16B1_ResetTimer
 * Description	: Reset of CT16B1 timer
 * Input			: None
 * Output		: None
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void CT16B1_Reset (void)
+void CT16B1_ResetTimer (void)
 {
 	//Set CT16B1 as the up-counting mode.
 	SN_CT16B1->TMRCTRL = (mskCT16_CRST);
