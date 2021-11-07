@@ -142,6 +142,8 @@ void pwm_lld_start(PWMDriver *pwmp) {
                 ((psc + 1) * pwmp->config->frequency) == pwmp->clock,
                 "invalid frequency");
   pwmp->ct->PRE  = psc;
+  pwmp->ct->MR24 = pwmp->period - 1;
+  pwmp->ct->MCTRL3 |= mskCT16_MR24RST_EN;
 
   /* PFPA - Map all PWM outputs to their PWM A pins */
   SN_PFPA->CT16B1 = 0x00000000;
@@ -703,7 +705,6 @@ void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
  * @notapi
  */
 void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
-  pwmp->ct->MR24 = pwmp->period - 1;
   pwmp->ct->MCTRL3 |= mskCT16_MR24IE_EN;
 }
 
