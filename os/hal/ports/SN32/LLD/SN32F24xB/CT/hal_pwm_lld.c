@@ -428,7 +428,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
   pwmp->ct->PWMCTRL2 = pwmctrl2;
   pwmp->ct->PWMENB   = pwmen;
   pwmp->ct->PWMIOENB = pwmioen;
-  pwmp->ct->IC       = 1;                   /* Clear pending IRQs.          */
+  pwmp->ct->IC       &= 0x1FFFFFF;           /* Clear pending IRQs.          */
 
   /* Timer configured and started.*/
   pwmp->ct->TMRCTRL |= mskCT16_CEN_EN;
@@ -446,7 +446,7 @@ void pwm_lld_stop(PWMDriver *pwmp) {
   /* If in ready state then disables the PWM clock.*/
   if (pwmp->state == PWM_READY) {
     pwmp->ct->TMRCTRL = CT16_CEN_DIS;       /* Timer disabled.              */
-    pwmp->ct->IC = 1;                       /* Clear pending IRQs.          */
+    pwmp->ct->IC &= 0x1FFFFFF;              /* Clear pending IRQs.          */
 
 #if SN32_PWM_USE_CT16B1
     if (&PWMD1 == pwmp) {
@@ -988,7 +988,7 @@ void pwm_lld_serve_interrupt(PWMDriver *pwmp) {
   if (((ris & mskCT16_MR23IF) != 0) &&
       (pwmp->config->channels[23].callback != NULL))
     pwmp->config->channels[23].callback(pwmp);
-  if (((ris & pwmp->ct->IC) != 0) && (pwmp->config->callback != NULL))
+  if (((ris & (pwmp->ct->IC &= 0x1FFFFFF)) != 0) && (pwmp->config->callback != NULL))
     pwmp->config->callback(pwmp);
 }
 
