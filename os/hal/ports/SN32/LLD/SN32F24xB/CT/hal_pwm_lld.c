@@ -594,99 +594,99 @@ void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
   switch(channel){
     case 0:
       pwmp->ct->IC |= mskCT16_MR0IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM0IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM0IOEN_EN;
       break;
     case 1:
       pwmp->ct->IC |= mskCT16_MR1IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM1IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM1IOEN_EN;
       break;
     case 2:
       pwmp->ct->IC |= mskCT16_MR2IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM2IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM2IOEN_EN;
       break;
     case 3:
       pwmp->ct->IC |= mskCT16_MR3IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM3IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM3IOEN_EN;
       break;
     case 4:
       pwmp->ct->IC |= mskCT16_MR4IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM4IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM4IOEN_EN;
       break;
     case 5:
       pwmp->ct->IC |= mskCT16_MR5IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM5IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM5IOEN_EN;
       break;
     case 6:
       pwmp->ct->IC |= mskCT16_MR6IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM6IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM6IOEN_EN;
       break;
     case 7:
       pwmp->ct->IC |= mskCT16_MR7IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM7IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM7IOEN_EN;
       break;
     case 8:
       pwmp->ct->IC |= mskCT16_MR8IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM8IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM8IOEN_EN;
       break;
     case 9:
       pwmp->ct->IC |= mskCT16_MR9IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM9IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM9IOEN_EN;
       break;
     case 10:
       pwmp->ct->IC |= mskCT16_MR10IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM10IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM10IOEN_EN;
       break;
     case 11:
       pwmp->ct->IC |= mskCT16_MR11IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM11IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM11IOEN_EN;
       break;
     case 12:
       pwmp->ct->IC |= mskCT16_MR12IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM12IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM12IOEN_EN;
       break;
     case 13:
       pwmp->ct->IC |= mskCT16_MR13IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM13IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM13IOEN_EN;
       break;
     case 14:
       pwmp->ct->IC |= mskCT16_MR14IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM14IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM14IOEN_EN;
       break;
     case 15:
       pwmp->ct->IC |= mskCT16_MR15IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM15IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM15IOEN_EN;
       break;
     case 16:
       pwmp->ct->IC |= mskCT16_MR16IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM16IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM16IOEN_EN;
       break;
     case 17:
       pwmp->ct->IC |= mskCT16_MR17IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM17IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM17IOEN_EN;
       break;
     case 18:
       pwmp->ct->IC |= mskCT16_MR18IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM18IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM18IOEN_EN;
       break;
     case 19:
       pwmp->ct->IC |= mskCT16_MR19IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM19IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM19IOEN_EN;
       break;
     case 20:
       pwmp->ct->IC |= mskCT16_MR20IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM20IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM20IOEN_EN;
       break;
     case 21:
       pwmp->ct->IC |= mskCT16_MR21IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM21IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM21IOEN_EN;
       break;
     case 22:
       pwmp->ct->IC |= mskCT16_MR22IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM22IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM22IOEN_EN;
       break;
     case 23:
       pwmp->ct->IC |= mskCT16_MR23IC;
-      pwmp->ct->PWMIOENB |= mskCT16_PWM23IOEN_DIS;
+      pwmp->ct->PWMIOENB &= ~mskCT16_PWM23IOEN_EN;
       break;
     default:
       ;
@@ -826,76 +826,76 @@ void pwm_lld_disable_channel_notification(PWMDriver *pwmp,
                                           pwmchannel_t channel) {
   switch(channel){
     case 0:
-      pwmp->ct->MCTRL |= mskCT16_MR0IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR0IE_EN;
       break;
     case 1:
-      pwmp->ct->MCTRL |= mskCT16_MR1IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR1IE_EN;
       break;
     case 2:
-      pwmp->ct->MCTRL |= mskCT16_MR2IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR2IE_EN;
       break;
     case 3:
-      pwmp->ct->MCTRL |= mskCT16_MR3IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR3IE_EN;
       break;
     case 4:
-      pwmp->ct->MCTRL |= mskCT16_MR4IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR4IE_EN;
       break;
     case 5:
-      pwmp->ct->MCTRL |= mskCT16_MR5IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR5IE_EN;
       break;
     case 6:
-      pwmp->ct->MCTRL |= mskCT16_MR6IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR6IE_EN;
       break;
     case 7:
-      pwmp->ct->MCTRL |= mskCT16_MR7IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR7IE_EN;
       break;
     case 8:
-      pwmp->ct->MCTRL |= mskCT16_MR8IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR8IE_EN;
       break;
     case 9:
-      pwmp->ct->MCTRL |= mskCT16_MR9IE_DIS;
+      pwmp->ct->MCTRL &= ~mskCT16_MR9IE_EN;
       break;
     case 10:
-      pwmp->ct->MCTRL2 |= mskCT16_MR10IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR10IE_EN;
       break;
     case 11:
-      pwmp->ct->MCTRL2 |= mskCT16_MR11IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR11IE_EN;
       break;
     case 12:
-      pwmp->ct->MCTRL2 |= mskCT16_MR12IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR12IE_EN;
       break;
     case 13:
-      pwmp->ct->MCTRL2 |= mskCT16_MR13IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR13IE_EN;
       break;
     case 14:
-      pwmp->ct->MCTRL2 |= mskCT16_MR14IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR14IE_EN;
       break;
     case 15:
-      pwmp->ct->MCTRL2 |= mskCT16_MR15IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR15IE_EN;
       break;
     case 16:
-      pwmp->ct->MCTRL2 |= mskCT16_MR16IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR16IE_EN;
       break;
     case 17:
-      pwmp->ct->MCTRL2 |= mskCT16_MR17IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR17IE_EN;
       break;
     case 18:
-      pwmp->ct->MCTRL2 |= mskCT16_MR18IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR18IE_EN;
       break;
     case 19:
-      pwmp->ct->MCTRL2 |= mskCT16_MR19IE_DIS;
+      pwmp->ct->MCTRL2 &= ~mskCT16_MR19IE_EN;
       break;
     case 20:
-      pwmp->ct->MCTRL3 |= mskCT16_MR20IE_DIS;
+      pwmp->ct->MCTRL3 &= ~mskCT16_MR20IE_EN;
       break;
     case 21:
-      pwmp->ct->MCTRL3 |= mskCT16_MR21IE_DIS;
+      pwmp->ct->MCTRL3 &= ~mskCT16_MR21IE_EN;
       break;
     case 22:
-      pwmp->ct->MCTRL3 |= mskCT16_MR22IE_DIS;
+      pwmp->ct->MCTRL3 &= ~mskCT16_MR22IE_EN;
       break;
     case 23:
-      pwmp->ct->MCTRL3 |= mskCT16_MR23IE_DIS;
+      pwmp->ct->MCTRL3 &= ~mskCT16_MR23IE_EN;
       break;
     default:
       ;
