@@ -230,12 +230,12 @@ struct PWMDriver {
  *          guaranteed.
  *
  * @param[in] pwmp      pointer to a @p PWMDriver object
- * @param[in] newperiod new cycle time in ticks
+ * @param[in] period    new cycle time in ticks
  *
  * @notapi
  */
-#define pwm_lld_change_period(pwmp, newperiod)                                 \
-  ((pwmp)->period = ((newperiod) - 1))
+#define pwm_lld_change_period(pwmp, period)                                 \
+  ((pwmp)->ct->MR24 = ((period) - 1))
 
 /*===========================================================================*/
 /* External declarations.                                                    */
