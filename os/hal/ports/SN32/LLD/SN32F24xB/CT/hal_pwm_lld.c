@@ -123,12 +123,8 @@ void pwm_lld_start(PWMDriver *pwmp) {
     }
 #endif
 
-    /* All channels configured in PWM1 mode with preload enabled and will
+    /* All channels configured in PWM1 mode by default and not enabled and will
        stay that way until the driver is stopped.*/
-    pwmp->ct->PWMCTRL = 1;
-    pwmp->ct->PWMCTRL2 = 1;
-    pwmp->ct->PWMENB = 1;
-    pwmp->ct->PWMIOENB = 1;
   }
   else {
     /* Driver re-configuration scenario, it must be stopped first.*/
