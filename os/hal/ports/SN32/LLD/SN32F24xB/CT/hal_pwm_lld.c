@@ -984,7 +984,7 @@ void pwm_lld_serve_interrupt(PWMDriver *pwmp) {
   if (((ris & mskCT16_MR23IF) != 0) &&
       (pwmp->config->channels[23].callback != NULL))
     pwmp->config->channels[23].callback(pwmp);
-  if (((ris & (pwmp->ct->IC &= 0x1FFFFFF)) != 0) && (pwmp->config->callback != NULL))
+  if (((ris & mskCT16_MR24IF) != 0) && (pwmp->config->callback != NULL))
     pwmp->config->callback(pwmp);
 }
 
