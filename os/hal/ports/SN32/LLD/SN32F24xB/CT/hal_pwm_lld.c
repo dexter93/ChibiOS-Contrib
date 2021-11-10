@@ -139,7 +139,12 @@ void pwm_lld_start(PWMDriver *pwmp) {
                 "invalid frequency");
   pwmp->ct->PRE  = psc;
   pwmp->ct->MR24 = pwmp->period - 1;
+
+#if SN32_PWM_USE_ONESHOT || defined(__DOXYGEN__)
+  pwmp->ct->MCTRL3 |= mskCT16_MR24STOP_EN;
+#else
   pwmp->ct->MCTRL3 |= mskCT16_MR24RST_EN;
+#endif
 
   /* PFPA - Map all PWM outputs to their PWM A pins */
   SN_PFPA->CT16B1 = 0x00000000;
