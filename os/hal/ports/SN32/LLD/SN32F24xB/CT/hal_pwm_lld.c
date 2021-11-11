@@ -129,7 +129,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
   else {
     /* Driver re-configuration scenario, it must be stopped first.*/
     pwmp->ct->TMRCTRL = CT16_CEN_DIS;       /* Timer disabled.              */
-    pwmp->ct->TMRCTRL = mskCT16_CRST;       /* Counter reset to zero.       */
+    CT16B1_ResetTimer();                    /* Counter reset to zero.       */
   }
 
   /* Timer configuration.*/
