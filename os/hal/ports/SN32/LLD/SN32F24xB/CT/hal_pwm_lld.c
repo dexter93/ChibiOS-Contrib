@@ -744,6 +744,7 @@ void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
  */
 void pwm_lld_disable_periodic_notification(PWMDriver *pwmp) {
   pwmp->ct->IC |= mskCT16_MR24IC;
+  pwmp->ct->MCTRL3 &= ~mskCT16_MR24IE_EN;
 }
 
 /**
