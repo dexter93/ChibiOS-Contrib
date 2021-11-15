@@ -123,29 +123,6 @@ void pwm_lld_start(PWMDriver *pwmp) {
     }
 #endif
 
-    /* All channels configured in PWM1 mode by default and not enabled and will
-       stay that way until the driver is stopped.*/
-  }
-  else {
-    /* Driver re-configuration scenario, it must be stopped first.*/
-    pwmp->ct->TMRCTRL = CT16_CEN_DIS;       /* Timer disabled.              */
-    CT16B1_ResetTimer();                    /* Counter reset to zero.       */
-  }
-
-  /* Timer configuration.*/
-  psc = (pwmp->clock / pwmp->config->frequency) - 1;
-  osalDbgAssert((psc <= 0xFF) &&     /* Prescaler calculation.             */
-                ((psc + 1) * pwmp->config->frequency) == pwmp->clock,
-                "invalid frequency");
-  pwmp->ct->PRE  = psc;
-  pwmp->ct->MR24 = pwmp->period - 1;
-
-#if SN32_PWM_USE_ONESHOT || defined(__DOXYGEN__)
-  pwmp->ct->MCTRL3 |= mskCT16_MR24STOP_EN;
-#else
-  pwmp->ct->MCTRL3 |= mskCT16_MR24RST_EN;
-#endif
-
   /* PFPA - Map all PWM outputs to their PWM A pins */
   SN_PFPA->CT16B1 = 0x00000000;
   /* PFPA assignment for PWM B-pin mapping.*/
@@ -154,8 +131,8 @@ void pwm_lld_start(PWMDriver *pwmp) {
       SN_PFPA->CT16B1 |= (1<<i);
     }
   }
-
-  /* Output enables and polarities setup.*/
+  
+  /* Channel PWM mode selection and polarities setup.*/
   pwmctrl = 0;
   pwmctrl2 = 0;
   pwmen = 0;
@@ -453,6 +430,26 @@ void pwm_lld_start(PWMDriver *pwmp) {
   pwmp->ct->PWMCTRL2 = pwmctrl2;
   pwmp->ct->PWMENB   = pwmen;
   pwmp->ct->PWMIOENB = pwmioen;
+  }
+  else {
+    /* Driver re-configuration scenario, it must be stopped first.*/
+    pwmp->ct->TMRCTRL = CT16_CEN_DIS;       /* Timer disabled.              */
+    CT16B1_ResetTimer();                    /* Counter reset to zero.       */
+  }
+
+  /* Timer configuration.*/
+  psc = (pwmp->clock / pwmp->config->frequency) - 1;
+  osalDbgAssert((psc <= 0xFF) &&     /* Prescaler calculation.             */
+                ((psc + 1) * pwmp->config->frequency) == pwmp->clock,
+                "invalid frequency");
+  pwmp->ct->PRE  = psc;
+  pwmp->ct->MR24 = pwmp->period - 1;
+
+#if SN32_PWM_USE_ONESHOT || defined(__DOXYGEN__)
+  pwmp->ct->MCTRL3 |= mskCT16_MR24STOP_EN;
+#else
+  pwmp->ct->MCTRL3 |= mskCT16_MR24RST_EN;
+#endif
   pwmp->ct->IC       &= 0x1FFFFFF;           /* Clear pending IRQs.          */
 
   /* Timer configured and started.*/
