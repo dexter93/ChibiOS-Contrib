@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    SN32F24xx/sn32_registry.h
- * @brief   SN32F24xx capabilities registry.
+ * @file    SN32F240B/sn32_registry.h
+ * @brief   SN32F24xB capabilities registry.
  *
  * @addtogroup HAL
  * @{
@@ -25,6 +25,7 @@
 #ifndef SN32_REGISTRY_H
 #define SN32_REGISTRY_H
 
+/* Common identifier of all SN32F24xx devices.*/
 #if !defined(SN32F24xx) || defined(__DOXYGEN__)
 #define SN32F24xx
 #endif
@@ -34,9 +35,14 @@
 /*===========================================================================*/
 
 /**
- * @name    SN32F24xx capabilities
+ * @name    SN32F24xB capabilities
  * @{
  */
+
+/* Common identifier of all SN32F24xB devices.*/
+#if !defined(SN32F240B) || defined(__DOXYGEN__)
+#define SN32F240B
+#endif
 
 /*
  * ST unit
