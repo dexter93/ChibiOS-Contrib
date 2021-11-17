@@ -89,7 +89,7 @@ void pwm_lld_init(void) {
 #if SN32_PWM_USE_CT16B1
   /* Driver initialization.*/
   pwmObjectInit(&PWMD1);
-  PWMD1.channels = SN32_CT16B1_CHANNELS;
+  PWMD1.channels = PWM_CHANNELS;
   PWMD1.ct = SN32_CT16B1;
 #endif
 }
@@ -413,6 +413,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
     pwmioen |= mskCT16_PWM22IOEN_EN;
     break;
   }
+#if PWM_CHANNELS > 23
   switch (pwmp->config->channels[23].mode & PWM_OUTPUT_MASK) {
   case PWM_OUTPUT_ACTIVE_HIGH:
     pwmctrl2 |= mskCT16_PWM23MODE_1;
@@ -425,7 +426,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
     pwmioen |= mskCT16_PWM23IOEN_EN;
     break;
   }
-
+#endif
   pwmp->ct->PWMCTRL  = pwmctrl;
   pwmp->ct->PWMCTRL2 = pwmctrl2;
   pwmp->ct->PWMENB   = pwmen;
@@ -443,12 +444,22 @@ void pwm_lld_start(PWMDriver *pwmp) {
                 ((psc + 1) * pwmp->config->frequency) == pwmp->clock,
                 "invalid frequency");
   pwmp->ct->PRE  = psc;
+#if PWM_CHANNELS > 23
   pwmp->ct->MR24 = pwmp->period - 1;
 
 #if SN32_PWM_USE_ONESHOT || defined(__DOXYGEN__)
   pwmp->ct->MCTRL3 |= mskCT16_MR24STOP_EN;
 #else
   pwmp->ct->MCTRL3 |= mskCT16_MR24RST_EN;
+#endif
+#else
+  pwmp->ct->MR23 = pwmp->period - 1;
+
+#if SN32_PWM_USE_ONESHOT || defined(__DOXYGEN__)
+  pwmp->ct->MCTRL3 |= mskCT16_MR23STOP_EN;
+#else
+  pwmp->ct->MCTRL3 |= mskCT16_MR23RST_EN;
+#endif
 #endif
   pwmp->ct->IC       &= 0x1FFFFFF;           /* Clear pending IRQs.          */
 
@@ -592,10 +603,12 @@ void pwm_lld_enable_channel(PWMDriver *pwmp,
       pwmp->ct->MR22 = width;
       pwmp->ct->PWMIOENB |= mskCT16_PWM22IOEN_EN;
       break;
+#if PWM_CHANNELS > 23
     case 23:
       pwmp->ct->MR23 = width;
       pwmp->ct->PWMIOENB |= mskCT16_PWM23IOEN_EN;
       break;
+#endif
     default:
       ;
   }
@@ -708,10 +721,12 @@ void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
       pwmp->ct->IC |= mskCT16_MR22IC;
       pwmp->ct->PWMIOENB &= ~mskCT16_PWM22IOEN_EN;
       break;
+#if PWM_CHANNELS > 23
     case 23:
       pwmp->ct->IC |= mskCT16_MR23IC;
       pwmp->ct->PWMIOENB &= ~mskCT16_PWM23IOEN_EN;
       break;
+#endif
     default:
       ;
   }
@@ -727,7 +742,11 @@ void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
  * @notapi
  */
 void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
+#if PWM_CHANNELS > 23
   pwmp->ct->MCTRL3 |= mskCT16_MR24IE_EN;
+#else
+  pwmp->ct->MCTRL3 |= mskCT16_MR23IE_EN;
+#endif
 }
 
 /**
@@ -740,8 +759,13 @@ void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
  * @notapi
  */
 void pwm_lld_disable_periodic_notification(PWMDriver *pwmp) {
+#if PWM_CHANNELS > 23
   pwmp->ct->IC |= mskCT16_MR24IC;
   pwmp->ct->MCTRL3 &= ~mskCT16_MR24IE_EN;
+#else
+  pwmp->ct->IC |= mskCT16_MR23IC;
+  pwmp->ct->MCTRL3 &= ~mskCT16_MR23IE_EN;
+#endif
 }
 
 /**
@@ -827,9 +851,11 @@ void pwm_lld_enable_channel_notification(PWMDriver *pwmp,
     case 22:
       pwmp->ct->MCTRL3 |= mskCT16_MR22IE_EN;
       break;
+#if PWM_CHANNELS > 23
     case 23:
       pwmp->ct->MCTRL3 |= mskCT16_MR23IE_EN;
       break;
+#endif
     default:
       ;
   }
@@ -918,9 +944,11 @@ void pwm_lld_disable_channel_notification(PWMDriver *pwmp,
     case 22:
       pwmp->ct->MCTRL3 &= ~mskCT16_MR22IE_EN;
       break;
+#if PWM_CHANNELS > 23
     case 23:
       pwmp->ct->MCTRL3 &= ~mskCT16_MR23IE_EN;
       break;
+#endif
     default:
       ;
   }}
@@ -1008,11 +1036,16 @@ void pwm_lld_serve_interrupt(PWMDriver *pwmp) {
   if (((ris & mskCT16_MR22IF) != 0) &&
       (pwmp->config->channels[22].callback != NULL))
     pwmp->config->channels[22].callback(pwmp);
+#if PWM_CHANNELS > 23
   if (((ris & mskCT16_MR23IF) != 0) &&
       (pwmp->config->channels[23].callback != NULL))
     pwmp->config->channels[23].callback(pwmp);
   if (((ris & mskCT16_MR24IF) != 0) && (pwmp->config->callback != NULL))
     pwmp->config->callback(pwmp);
+#else
+  if (((ris & mskCT16_MR23IF) != 0) && (pwmp->config->callback != NULL))
+    pwmp->config->callback(pwmp);
+#endif
 }
 
 #endif /* HAL_USE_PWM */

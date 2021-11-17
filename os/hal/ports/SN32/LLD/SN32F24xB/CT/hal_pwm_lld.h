@@ -235,8 +235,11 @@ struct PWMDriver {
  * @notapi
  */
 #define pwm_lld_change_period(pwmp, period)                                 \
+#if PWM_CHANNELS > 23
   ((pwmp)->ct->MR24 = ((period) - 1))
-
+#else
+  ((pwmp)->ct->MR23 = ((period) - 1))
+#endif
 /*===========================================================================*/
 /* External declarations.                                                    */
 /*===========================================================================*/
