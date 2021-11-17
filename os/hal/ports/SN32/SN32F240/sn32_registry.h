@@ -25,9 +25,9 @@
 #ifndef SN32_REGISTRY_H
 #define SN32_REGISTRY_H
 
-/* Common identifier of all SN32F24xx devices.*/
-#if !defined(SN32F24xx) || defined(__DOXYGEN__)
-#define SN32F24xx
+/* Common identifier of all SN32F2xx devices.*/
+#if !defined(SN32F2xx) || defined(__DOXYGEN__)
+#define SN32F2xx
 #endif
 
 /*===========================================================================*/
