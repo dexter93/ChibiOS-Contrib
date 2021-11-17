@@ -123,6 +123,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
     }
 #endif
 
+#if defined(SN32F240B)
   /* PFPA - Map all PWM outputs to their PWM A pins */
   SN_PFPA->CT16B1 = 0x00000000;
   /* PFPA assignment for PWM B-pin mapping.*/
@@ -131,7 +132,8 @@ void pwm_lld_start(PWMDriver *pwmp) {
       SN_PFPA->CT16B1 |= (1<<i);
     }
   }
-  
+#endif
+
   /* Channel PWM mode selection and polarities setup.*/
   pwmctrl = 0;
   pwmctrl2 = 0;
