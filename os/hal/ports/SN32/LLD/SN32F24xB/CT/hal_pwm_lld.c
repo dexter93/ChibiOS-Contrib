@@ -113,328 +113,328 @@ void pwm_lld_start(PWMDriver *pwmp) {
   if (pwmp->state == PWM_STOP) {
     /* Clock activation and timer reset.*/
 #if SN32_PWM_USE_CT16B1
-    if (&PWMD1 == pwmp) {
-      CT16B1_Init();
-      CT16B1_ResetTimer();
+        if (&PWMD1 == pwmp) {
+          CT16B1_Init();
+          CT16B1_ResetTimer();
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
-      nvicEnableVector(SN32_CT16B1_NUMBER, SN32_PWM_CT16B1_IRQ_PRIORITY);
-#endif
-    pwmp->clock = SystemCoreClock;
-    }
-#endif
-
+          nvicEnableVector(SN32_CT16B1_NUMBER, SN32_PWM_CT16B1_IRQ_PRIORITY);
+#endif /* !defined(SN32_CT16B1_SUPPRESS_ISR) */
+        pwmp->clock = SystemCoreClock;
+        }
+#endif /* SN32_PWM_USE_CT16B1 */
+    
 #if defined(SN32F240B)
-  /* PFPA - Map all PWM outputs to their PWM A pins */
-  SN_PFPA->CT16B1 = 0x00000000;
-  /* PFPA assignment for PWM B-pin mapping.*/
-  for(uint8_t i=0; i<PWM_CHANNELS; i++){
-    if(pwmp->config->channels[i].pfpamsk != 0) {
-      SN_PFPA->CT16B1 |= (1<<i);
-    }
-  }
-#endif
-
-  /* Channel PWM mode selection and polarities setup.*/
-  pwmctrl = 0;
-  pwmctrl2 = 0;
-  pwmen = 0;
-  pwmioen = 0;
-  switch (pwmp->config->channels[0].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM0MODE_1;
-    pwmen |= mskCT16_PWM0EN_EN;
-    pwmioen |= mskCT16_PWM0IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM0MODE_2;
-    pwmen |= mskCT16_PWM0EN_EN;
-    pwmioen |= mskCT16_PWM0IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[1].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM1MODE_1;
-    pwmen |= mskCT16_PWM1EN_EN;
-    pwmioen |= mskCT16_PWM1IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM1MODE_2;
-    pwmen |= mskCT16_PWM1EN_EN;
-    pwmioen |= mskCT16_PWM1IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[2].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM2MODE_1;
-    pwmen |= mskCT16_PWM2EN_EN;
-    pwmioen |= mskCT16_PWM2IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM2MODE_2;
-    pwmen |= mskCT16_PWM2EN_EN;
-    pwmioen |= mskCT16_PWM2IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[3].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM3MODE_1;
-    pwmen |= mskCT16_PWM3EN_EN;
-    pwmioen |= mskCT16_PWM3IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM3MODE_2;
-    pwmen |= mskCT16_PWM3EN_EN;
-    pwmioen |= mskCT16_PWM3IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[4].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM4MODE_1;
-    pwmen |= mskCT16_PWM4EN_EN;
-    pwmioen |= mskCT16_PWM4IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM4MODE_2;
-    pwmen |= mskCT16_PWM4EN_EN;
-    pwmioen |= mskCT16_PWM4IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[5].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM5MODE_1;
-    pwmen |= mskCT16_PWM5EN_EN;
-    pwmioen |= mskCT16_PWM5IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM5MODE_2;
-    pwmen |= mskCT16_PWM5EN_EN;
-    pwmioen |= mskCT16_PWM5IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[6].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM6MODE_1;
-    pwmen |= mskCT16_PWM6EN_EN;
-    pwmioen |= mskCT16_PWM6IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM6MODE_2;
-    pwmen |= mskCT16_PWM6EN_EN;
-    pwmioen |= mskCT16_PWM6IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[7].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM7MODE_1;
-    pwmen |= mskCT16_PWM7EN_EN;
-    pwmioen |= mskCT16_PWM7IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM7MODE_2;
-    pwmen |= mskCT16_PWM7EN_EN;
-    pwmioen |= mskCT16_PWM7IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[8].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM8MODE_1;
-    pwmen |= mskCT16_PWM8EN_EN;
-    pwmioen |= mskCT16_PWM8IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM8MODE_2;
-    pwmen |= mskCT16_PWM8EN_EN;
-    pwmioen |= mskCT16_PWM8IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[9].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM9MODE_1;
-    pwmen |= mskCT16_PWM9EN_EN;
-    pwmioen |= mskCT16_PWM9IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM9MODE_2;
-    pwmen |= mskCT16_PWM9EN_EN;
-    pwmioen |= mskCT16_PWM9IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[10].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM10MODE_1;
-    pwmen |= mskCT16_PWM10EN_EN;
-    pwmioen |= mskCT16_PWM10IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM10MODE_2;
-    pwmen |= mskCT16_PWM10EN_EN;
-    pwmioen |= mskCT16_PWM10IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[11].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM11MODE_1;
-    pwmen |= mskCT16_PWM11EN_EN;
-    pwmioen |= mskCT16_PWM11IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM11MODE_2;
-    pwmen |= mskCT16_PWM11EN_EN;
-    pwmioen |= mskCT16_PWM11IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[12].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM12MODE_1;
-    pwmen |= mskCT16_PWM12EN_EN;
-    pwmioen |= mskCT16_PWM12IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM12MODE_2;
-    pwmen |= mskCT16_PWM12EN_EN;
-    pwmioen |= mskCT16_PWM12IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[13].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM13MODE_1;
-    pwmen |= mskCT16_PWM13EN_EN;
-    pwmioen |= mskCT16_PWM13IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM13MODE_2;
-    pwmen |= mskCT16_PWM13EN_EN;
-    pwmioen |= mskCT16_PWM13IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[14].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM14MODE_1;
-    pwmen |= mskCT16_PWM14EN_EN;
-    pwmioen |= mskCT16_PWM14IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM14MODE_2;
-    pwmen |= mskCT16_PWM14EN_EN;
-    pwmioen |= mskCT16_PWM14IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[15].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl |= mskCT16_PWM15MODE_1;
-    pwmen |= mskCT16_PWM15EN_EN;
-    pwmioen |= mskCT16_PWM15IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl |= mskCT16_PWM15MODE_2;
-    pwmen |= mskCT16_PWM15EN_EN;
-    pwmioen |= mskCT16_PWM15IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[16].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl2 |= mskCT16_PWM16MODE_1;
-    pwmen |= mskCT16_PWM16EN_EN;
-    pwmioen |= mskCT16_PWM16IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl2 |= mskCT16_PWM16MODE_2;
-    pwmen |= mskCT16_PWM16EN_EN;
-    pwmioen |= mskCT16_PWM16IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[17].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl2 |= mskCT16_PWM17MODE_1;
-    pwmen |= mskCT16_PWM17EN_EN;
-    pwmioen |= mskCT16_PWM17IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl2 |= mskCT16_PWM17MODE_2;
-    pwmen |= mskCT16_PWM17EN_EN;
-    pwmioen |= mskCT16_PWM17IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[18].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl2 |= mskCT16_PWM18MODE_1;
-    pwmen |= mskCT16_PWM18EN_EN;
-    pwmioen |= mskCT16_PWM18IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl2 |= mskCT16_PWM18MODE_2;
-    pwmen |= mskCT16_PWM18EN_EN;
-    pwmioen |= mskCT16_PWM18IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[19].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl2 |= mskCT16_PWM19MODE_1;
-    pwmen |= mskCT16_PWM19EN_EN;
-    pwmioen |= mskCT16_PWM19IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl2 |= mskCT16_PWM19MODE_2;
-    pwmen |= mskCT16_PWM19EN_EN;
-    pwmioen |= mskCT16_PWM19IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[20].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl2 |= mskCT16_PWM20MODE_1;
-    pwmen |= mskCT16_PWM20EN_EN;
-    pwmioen |= mskCT16_PWM20IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl2 |= mskCT16_PWM20MODE_2;
-    pwmen |= mskCT16_PWM20EN_EN;
-    pwmioen |= mskCT16_PWM20IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[21].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl2 |= mskCT16_PWM21MODE_1;
-    pwmen |= mskCT16_PWM21EN_EN;
-    pwmioen |= mskCT16_PWM21IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl2 |= mskCT16_PWM21MODE_2;
-    pwmen |= mskCT16_PWM21EN_EN;
-    pwmioen |= mskCT16_PWM21IOEN_EN;
-    break;
-  }
-  switch (pwmp->config->channels[22].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl2 |= mskCT16_PWM22MODE_1;
-    pwmen |= mskCT16_PWM22EN_EN;
-    pwmioen |= mskCT16_PWM22IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl2 |= mskCT16_PWM22MODE_2;
-    pwmen |= mskCT16_PWM22EN_EN;
-    pwmioen |= mskCT16_PWM22IOEN_EN;
-    break;
-  }
+      /* PFPA - Map all PWM outputs to their PWM A pins */
+      SN_PFPA->CT16B1 = 0x00000000;
+      /* PFPA assignment for PWM B-pin mapping.*/
+      for(uint8_t i=0; i<PWM_CHANNELS; i++){
+        if(pwmp->config->channels[i].pfpamsk != 0) {
+          SN_PFPA->CT16B1 |= (1<<i);
+        }
+      }
+#endif /* defined(SN32F240B) */
+    
+      /* Channel PWM mode selection and polarities setup.*/
+      pwmctrl = 0;
+      pwmctrl2 = 0;
+      pwmen = 0;
+      pwmioen = 0;
+      switch (pwmp->config->channels[0].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM0MODE_1;
+        pwmen |= mskCT16_PWM0EN_EN;
+        pwmioen |= mskCT16_PWM0IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM0MODE_2;
+        pwmen |= mskCT16_PWM0EN_EN;
+        pwmioen |= mskCT16_PWM0IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[1].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM1MODE_1;
+        pwmen |= mskCT16_PWM1EN_EN;
+        pwmioen |= mskCT16_PWM1IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM1MODE_2;
+        pwmen |= mskCT16_PWM1EN_EN;
+        pwmioen |= mskCT16_PWM1IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[2].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM2MODE_1;
+        pwmen |= mskCT16_PWM2EN_EN;
+        pwmioen |= mskCT16_PWM2IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM2MODE_2;
+        pwmen |= mskCT16_PWM2EN_EN;
+        pwmioen |= mskCT16_PWM2IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[3].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM3MODE_1;
+        pwmen |= mskCT16_PWM3EN_EN;
+        pwmioen |= mskCT16_PWM3IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM3MODE_2;
+        pwmen |= mskCT16_PWM3EN_EN;
+        pwmioen |= mskCT16_PWM3IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[4].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM4MODE_1;
+        pwmen |= mskCT16_PWM4EN_EN;
+        pwmioen |= mskCT16_PWM4IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM4MODE_2;
+        pwmen |= mskCT16_PWM4EN_EN;
+        pwmioen |= mskCT16_PWM4IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[5].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM5MODE_1;
+        pwmen |= mskCT16_PWM5EN_EN;
+        pwmioen |= mskCT16_PWM5IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM5MODE_2;
+        pwmen |= mskCT16_PWM5EN_EN;
+        pwmioen |= mskCT16_PWM5IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[6].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM6MODE_1;
+        pwmen |= mskCT16_PWM6EN_EN;
+        pwmioen |= mskCT16_PWM6IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM6MODE_2;
+        pwmen |= mskCT16_PWM6EN_EN;
+        pwmioen |= mskCT16_PWM6IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[7].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM7MODE_1;
+        pwmen |= mskCT16_PWM7EN_EN;
+        pwmioen |= mskCT16_PWM7IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM7MODE_2;
+        pwmen |= mskCT16_PWM7EN_EN;
+        pwmioen |= mskCT16_PWM7IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[8].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM8MODE_1;
+        pwmen |= mskCT16_PWM8EN_EN;
+        pwmioen |= mskCT16_PWM8IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM8MODE_2;
+        pwmen |= mskCT16_PWM8EN_EN;
+        pwmioen |= mskCT16_PWM8IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[9].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM9MODE_1;
+        pwmen |= mskCT16_PWM9EN_EN;
+        pwmioen |= mskCT16_PWM9IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM9MODE_2;
+        pwmen |= mskCT16_PWM9EN_EN;
+        pwmioen |= mskCT16_PWM9IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[10].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM10MODE_1;
+        pwmen |= mskCT16_PWM10EN_EN;
+        pwmioen |= mskCT16_PWM10IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM10MODE_2;
+        pwmen |= mskCT16_PWM10EN_EN;
+        pwmioen |= mskCT16_PWM10IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[11].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM11MODE_1;
+        pwmen |= mskCT16_PWM11EN_EN;
+        pwmioen |= mskCT16_PWM11IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM11MODE_2;
+        pwmen |= mskCT16_PWM11EN_EN;
+        pwmioen |= mskCT16_PWM11IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[12].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM12MODE_1;
+        pwmen |= mskCT16_PWM12EN_EN;
+        pwmioen |= mskCT16_PWM12IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM12MODE_2;
+        pwmen |= mskCT16_PWM12EN_EN;
+        pwmioen |= mskCT16_PWM12IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[13].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM13MODE_1;
+        pwmen |= mskCT16_PWM13EN_EN;
+        pwmioen |= mskCT16_PWM13IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM13MODE_2;
+        pwmen |= mskCT16_PWM13EN_EN;
+        pwmioen |= mskCT16_PWM13IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[14].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM14MODE_1;
+        pwmen |= mskCT16_PWM14EN_EN;
+        pwmioen |= mskCT16_PWM14IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM14MODE_2;
+        pwmen |= mskCT16_PWM14EN_EN;
+        pwmioen |= mskCT16_PWM14IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[15].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl |= mskCT16_PWM15MODE_1;
+        pwmen |= mskCT16_PWM15EN_EN;
+        pwmioen |= mskCT16_PWM15IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl |= mskCT16_PWM15MODE_2;
+        pwmen |= mskCT16_PWM15EN_EN;
+        pwmioen |= mskCT16_PWM15IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[16].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl2 |= mskCT16_PWM16MODE_1;
+        pwmen |= mskCT16_PWM16EN_EN;
+        pwmioen |= mskCT16_PWM16IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl2 |= mskCT16_PWM16MODE_2;
+        pwmen |= mskCT16_PWM16EN_EN;
+        pwmioen |= mskCT16_PWM16IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[17].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl2 |= mskCT16_PWM17MODE_1;
+        pwmen |= mskCT16_PWM17EN_EN;
+        pwmioen |= mskCT16_PWM17IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl2 |= mskCT16_PWM17MODE_2;
+        pwmen |= mskCT16_PWM17EN_EN;
+        pwmioen |= mskCT16_PWM17IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[18].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl2 |= mskCT16_PWM18MODE_1;
+        pwmen |= mskCT16_PWM18EN_EN;
+        pwmioen |= mskCT16_PWM18IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl2 |= mskCT16_PWM18MODE_2;
+        pwmen |= mskCT16_PWM18EN_EN;
+        pwmioen |= mskCT16_PWM18IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[19].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl2 |= mskCT16_PWM19MODE_1;
+        pwmen |= mskCT16_PWM19EN_EN;
+        pwmioen |= mskCT16_PWM19IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl2 |= mskCT16_PWM19MODE_2;
+        pwmen |= mskCT16_PWM19EN_EN;
+        pwmioen |= mskCT16_PWM19IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[20].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl2 |= mskCT16_PWM20MODE_1;
+        pwmen |= mskCT16_PWM20EN_EN;
+        pwmioen |= mskCT16_PWM20IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl2 |= mskCT16_PWM20MODE_2;
+        pwmen |= mskCT16_PWM20EN_EN;
+        pwmioen |= mskCT16_PWM20IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[21].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl2 |= mskCT16_PWM21MODE_1;
+        pwmen |= mskCT16_PWM21EN_EN;
+        pwmioen |= mskCT16_PWM21IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl2 |= mskCT16_PWM21MODE_2;
+        pwmen |= mskCT16_PWM21EN_EN;
+        pwmioen |= mskCT16_PWM21IOEN_EN;
+        break;
+      }
+      switch (pwmp->config->channels[22].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl2 |= mskCT16_PWM22MODE_1;
+        pwmen |= mskCT16_PWM22EN_EN;
+        pwmioen |= mskCT16_PWM22IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl2 |= mskCT16_PWM22MODE_2;
+        pwmen |= mskCT16_PWM22EN_EN;
+        pwmioen |= mskCT16_PWM22IOEN_EN;
+        break;
+      }
 #if PWM_CHANNELS > 23
-  switch (pwmp->config->channels[23].mode & PWM_OUTPUT_MASK) {
-  case PWM_OUTPUT_ACTIVE_LOW:
-    pwmctrl2 |= mskCT16_PWM23MODE_1;
-    pwmen |= mskCT16_PWM23EN_EN;
-    pwmioen |= mskCT16_PWM23IOEN_EN;
-    break;
-  case PWM_OUTPUT_ACTIVE_HIGH:
-    pwmctrl2 |= mskCT16_PWM23MODE_2;
-    pwmen |= mskCT16_PWM23EN_EN;
-    pwmioen |= mskCT16_PWM23IOEN_EN;
-    break;
+      switch (pwmp->config->channels[23].mode & PWM_OUTPUT_MASK) {
+      case PWM_OUTPUT_ACTIVE_LOW:
+        pwmctrl2 |= mskCT16_PWM23MODE_1;
+        pwmen |= mskCT16_PWM23EN_EN;
+        pwmioen |= mskCT16_PWM23IOEN_EN;
+        break;
+      case PWM_OUTPUT_ACTIVE_HIGH:
+        pwmctrl2 |= mskCT16_PWM23MODE_2;
+        pwmen |= mskCT16_PWM23EN_EN;
+        pwmioen |= mskCT16_PWM23IOEN_EN;
+        break;
+      }
+#endif /* PWM_CHANNELS > 23 */
+      pwmp->ct->PWMCTRL  = pwmctrl;
+      pwmp->ct->PWMCTRL2 = pwmctrl2;
+      pwmp->ct->PWMENB   = pwmen;
+      pwmp->ct->PWMIOENB = pwmioen;
   }
-#endif
-  pwmp->ct->PWMCTRL  = pwmctrl;
-  pwmp->ct->PWMCTRL2 = pwmctrl2;
-  pwmp->ct->PWMENB   = pwmen;
-  pwmp->ct->PWMIOENB = pwmioen;
-  }
-  else {
+  else { /* (pwmp->state != PWM_STOP) */
     /* Driver re-configuration scenario, it must be stopped first.*/
     pwmp->ct->TMRCTRL = CT16_CEN_DIS;       /* Timer disabled.              */
     CT16B1_ResetTimer();                    /* Counter reset to zero.       */
@@ -453,7 +453,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
   pwmp->ct->MCTRL3 |= mskCT16_MR24STOP_EN;
 #else
   pwmp->ct->MCTRL3 |= mskCT16_MR24RST_EN;
-#endif
+#endif /* SN32_PWM_USE_ONESHOT */
 #else
   pwmp->ct->MR23 = pwmp->period - 1;
 
@@ -461,8 +461,8 @@ void pwm_lld_start(PWMDriver *pwmp) {
   pwmp->ct->MCTRL3 |= mskCT16_MR23STOP_EN;
 #else
   pwmp->ct->MCTRL3 |= mskCT16_MR23RST_EN;
-#endif
-#endif
+#endif /* SN32_PWM_USE_ONESHOT */
+#endif /* PWM_CHANNELS > 23 */
   pwmp->ct->IC       &= 0x1FFFFFF;           /* Clear pending IRQs.          */
 
   /* Timer configured and started.*/
@@ -490,7 +490,7 @@ void pwm_lld_stop(PWMDriver *pwmp) {
 #endif
       SN_SYS1->AHBCLKEN_b.CT16B1CLKEN = DISABLE;
     }
-#endif
+#endif /* SN32_PWM_USE_CT16B1 */
   }
 }
 
@@ -610,7 +610,7 @@ void pwm_lld_enable_channel(PWMDriver *pwmp,
       pwmp->ct->MR23 = width;
       pwmp->ct->PWMIOENB |= mskCT16_PWM23IOEN_EN;
       break;
-#endif
+#endif /* PWM_CHANNELS > 23 */
     default:
       ;
   }
@@ -728,7 +728,7 @@ void pwm_lld_disable_channel(PWMDriver *pwmp, pwmchannel_t channel) {
       pwmp->ct->IC |= mskCT16_MR23IC;
       pwmp->ct->PWMIOENB &= ~mskCT16_PWM23IOEN_EN;
       break;
-#endif
+#endif /* PWM_CHANNELS > 23 */
     default:
       ;
   }
@@ -748,7 +748,7 @@ void pwm_lld_enable_periodic_notification(PWMDriver *pwmp) {
   pwmp->ct->MCTRL3 |= mskCT16_MR24IE_EN;
 #else
   pwmp->ct->MCTRL3 |= mskCT16_MR23IE_EN;
-#endif
+#endif /* PWM_CHANNELS > 23 */
 }
 
 /**
@@ -767,7 +767,7 @@ void pwm_lld_disable_periodic_notification(PWMDriver *pwmp) {
 #else
   pwmp->ct->IC |= mskCT16_MR23IC;
   pwmp->ct->MCTRL3 &= ~mskCT16_MR23IE_EN;
-#endif
+#endif /* PWM_CHANNELS > 23 */
 }
 
 /**
@@ -857,7 +857,7 @@ void pwm_lld_enable_channel_notification(PWMDriver *pwmp,
     case 23:
       pwmp->ct->MCTRL3 |= mskCT16_MR23IE_EN;
       break;
-#endif
+#endif /* PWM_CHANNELS > 23 */
     default:
       ;
   }
@@ -950,7 +950,7 @@ void pwm_lld_disable_channel_notification(PWMDriver *pwmp,
     case 23:
       pwmp->ct->MCTRL3 &= ~mskCT16_MR23IE_EN;
       break;
-#endif
+#endif /* PWM_CHANNELS > 23 */
     default:
       ;
   }}
@@ -969,85 +969,90 @@ void pwm_lld_serve_interrupt(PWMDriver *pwmp) {
   uint32_t ris;
 
   ris  = pwmp->ct->RIS;
-  if (((ris & mskCT16_MR0IF) != 0) &&
-      (pwmp->config->channels[0].callback != NULL))
-    pwmp->config->channels[0].callback(pwmp);
-  if (((ris & mskCT16_MR1IF) != 0) &&
-      (pwmp->config->channels[1].callback != NULL))
-    pwmp->config->channels[1].callback(pwmp);
-  if (((ris & mskCT16_MR2IF) != 0) &&
-      (pwmp->config->channels[2].callback != NULL))
-    pwmp->config->channels[2].callback(pwmp);
-  if (((ris & mskCT16_MR3IF) != 0) &&
-      (pwmp->config->channels[3].callback != NULL))
-    pwmp->config->channels[3].callback(pwmp);
-  if (((ris & mskCT16_MR4IF) != 0) &&
-      (pwmp->config->channels[4].callback != NULL))
-    pwmp->config->channels[4].callback(pwmp);
-  if (((ris & mskCT16_MR5IF) != 0) &&
-      (pwmp->config->channels[5].callback != NULL))
-    pwmp->config->channels[5].callback(pwmp);
-  if (((ris & mskCT16_MR6IF) != 0) &&
-      (pwmp->config->channels[6].callback != NULL))
-    pwmp->config->channels[6].callback(pwmp);
-  if (((ris & mskCT16_MR7IF) != 0) &&
-      (pwmp->config->channels[7].callback != NULL))
-    pwmp->config->channels[7].callback(pwmp);
-  if (((ris & mskCT16_MR8IF) != 0) &&
-      (pwmp->config->channels[8].callback != NULL))
-    pwmp->config->channels[8].callback(pwmp);
-  if (((ris & mskCT16_MR9IF) != 0) &&
-      (pwmp->config->channels[9].callback != NULL))
-    pwmp->config->channels[9].callback(pwmp);
-  if (((ris & mskCT16_MR10IF) != 0) &&
-      (pwmp->config->channels[10].callback != NULL))
-    pwmp->config->channels[10].callback(pwmp);
-  if (((ris & mskCT16_MR11IF) != 0) &&
-      (pwmp->config->channels[11].callback != NULL))
-    pwmp->config->channels[11].callback(pwmp);
-  if (((ris & mskCT16_MR12IF) != 0) &&
-      (pwmp->config->channels[12].callback != NULL))
-    pwmp->config->channels[12].callback(pwmp);
-  if (((ris & mskCT16_MR13IF) != 0) &&
-      (pwmp->config->channels[13].callback != NULL))
-    pwmp->config->channels[13].callback(pwmp);
-  if (((ris & mskCT16_MR14IF) != 0) &&
-      (pwmp->config->channels[14].callback != NULL))
-    pwmp->config->channels[14].callback(pwmp);
-  if (((ris & mskCT16_MR15IF) != 0) &&
-      (pwmp->config->channels[15].callback != NULL))
-    pwmp->config->channels[15].callback(pwmp);
-  if (((ris & mskCT16_MR16IF) != 0) &&
-      (pwmp->config->channels[16].callback != NULL))
-    pwmp->config->channels[16].callback(pwmp);
-  if (((ris & mskCT16_MR17IF) != 0) &&
-      (pwmp->config->channels[17].callback != NULL))
-    pwmp->config->channels[17].callback(pwmp);
-  if (((ris & mskCT16_MR18IF) != 0) &&
-      (pwmp->config->channels[18].callback != NULL))
-    pwmp->config->channels[18].callback(pwmp);
-  if (((ris & mskCT16_MR19IF) != 0) &&
-      (pwmp->config->channels[19].callback != NULL))
-    pwmp->config->channels[19].callback(pwmp);
-  if (((ris & mskCT16_MR20IF) != 0) &&
-      (pwmp->config->channels[20].callback != NULL))
-    pwmp->config->channels[20].callback(pwmp);
-  if (((ris & mskCT16_MR21IF) != 0) &&
-      (pwmp->config->channels[21].callback != NULL))
-    pwmp->config->channels[21].callback(pwmp);
-  if (((ris & mskCT16_MR22IF) != 0) &&
-      (pwmp->config->channels[22].callback != NULL))
-    pwmp->config->channels[22].callback(pwmp);
 #if PWM_CHANNELS > 23
-  if (((ris & mskCT16_MR23IF) != 0) &&
-      (pwmp->config->channels[23].callback != NULL))
-    pwmp->config->channels[23].callback(pwmp);
-  if (((ris & mskCT16_MR24IF) != 0) && (pwmp->config->callback != NULL))
-    pwmp->config->callback(pwmp);
+  if ((ris & 0xFFFFFF) != 0) {
+#endif /* PWM_CHANNELS > 23 */
+      if (((ris & mskCT16_MR0IF) != 0) &&
+          (pwmp->config->channels[0].callback != NULL))
+        pwmp->config->channels[0].callback(pwmp);
+      if (((ris & mskCT16_MR1IF) != 0) &&
+          (pwmp->config->channels[1].callback != NULL))
+        pwmp->config->channels[1].callback(pwmp);
+      if (((ris & mskCT16_MR2IF) != 0) &&
+          (pwmp->config->channels[2].callback != NULL))
+        pwmp->config->channels[2].callback(pwmp);
+      if (((ris & mskCT16_MR3IF) != 0) &&
+          (pwmp->config->channels[3].callback != NULL))
+        pwmp->config->channels[3].callback(pwmp);
+      if (((ris & mskCT16_MR4IF) != 0) &&
+          (pwmp->config->channels[4].callback != NULL))
+        pwmp->config->channels[4].callback(pwmp);
+      if (((ris & mskCT16_MR5IF) != 0) &&
+          (pwmp->config->channels[5].callback != NULL))
+        pwmp->config->channels[5].callback(pwmp);
+      if (((ris & mskCT16_MR6IF) != 0) &&
+          (pwmp->config->channels[6].callback != NULL))
+        pwmp->config->channels[6].callback(pwmp);
+      if (((ris & mskCT16_MR7IF) != 0) &&
+          (pwmp->config->channels[7].callback != NULL))
+        pwmp->config->channels[7].callback(pwmp);
+      if (((ris & mskCT16_MR8IF) != 0) &&
+          (pwmp->config->channels[8].callback != NULL))
+        pwmp->config->channels[8].callback(pwmp);
+      if (((ris & mskCT16_MR9IF) != 0) &&
+          (pwmp->config->channels[9].callback != NULL))
+        pwmp->config->channels[9].callback(pwmp);
+      if (((ris & mskCT16_MR10IF) != 0) &&
+          (pwmp->config->channels[10].callback != NULL))
+        pwmp->config->channels[10].callback(pwmp);
+      if (((ris & mskCT16_MR11IF) != 0) &&
+          (pwmp->config->channels[11].callback != NULL))
+        pwmp->config->channels[11].callback(pwmp);
+      if (((ris & mskCT16_MR12IF) != 0) &&
+          (pwmp->config->channels[12].callback != NULL))
+        pwmp->config->channels[12].callback(pwmp);
+      if (((ris & mskCT16_MR13IF) != 0) &&
+          (pwmp->config->channels[13].callback != NULL))
+        pwmp->config->channels[13].callback(pwmp);
+      if (((ris & mskCT16_MR14IF) != 0) &&
+          (pwmp->config->channels[14].callback != NULL))
+        pwmp->config->channels[14].callback(pwmp);
+      if (((ris & mskCT16_MR15IF) != 0) &&
+          (pwmp->config->channels[15].callback != NULL))
+        pwmp->config->channels[15].callback(pwmp);
+      if (((ris & mskCT16_MR16IF) != 0) &&
+          (pwmp->config->channels[16].callback != NULL))
+        pwmp->config->channels[16].callback(pwmp);
+      if (((ris & mskCT16_MR17IF) != 0) &&
+          (pwmp->config->channels[17].callback != NULL))
+        pwmp->config->channels[17].callback(pwmp);
+      if (((ris & mskCT16_MR18IF) != 0) &&
+          (pwmp->config->channels[18].callback != NULL))
+        pwmp->config->channels[18].callback(pwmp);
+      if (((ris & mskCT16_MR19IF) != 0) &&
+          (pwmp->config->channels[19].callback != NULL))
+        pwmp->config->channels[19].callback(pwmp);
+      if (((ris & mskCT16_MR20IF) != 0) &&
+          (pwmp->config->channels[20].callback != NULL))
+        pwmp->config->channels[20].callback(pwmp);
+      if (((ris & mskCT16_MR21IF) != 0) &&
+          (pwmp->config->channels[21].callback != NULL))
+        pwmp->config->channels[21].callback(pwmp);
+      if (((ris & mskCT16_MR22IF) != 0) &&
+          (pwmp->config->channels[22].callback != NULL))
+        pwmp->config->channels[22].callback(pwmp);
+#if PWM_CHANNELS > 23
+      if (((ris & mskCT16_MR23IF) != 0) &&
+          (pwmp->config->channels[23].callback != NULL))
+        pwmp->config->channels[23].callback(pwmp);
+  } else {
+      if (((ris & mskCT16_MR24IF) != 0) && (pwmp->config->callback != NULL))
+        pwmp->config->callback(pwmp);
+    }
 #else
-  if (((ris & mskCT16_MR23IF) != 0) && (pwmp->config->callback != NULL))
-    pwmp->config->callback(pwmp);
-#endif
+      if (((ris & mskCT16_MR23IF) != 0) && (pwmp->config->callback != NULL))
+        pwmp->config->callback(pwmp);
+#endif /* PWM_CHANNELS > 23 */
 }
 
 #endif /* HAL_USE_PWM */
