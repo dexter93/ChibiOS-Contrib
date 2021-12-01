@@ -29,21 +29,19 @@
  */
 const PALConfig pal_default_config = {
   #if SN32_HAS_GPIOA
-  {VAL_GPIOA_MODE},
+  {.mode = VAL_GPIOA_MODE, .cfg = VAL_GPIOA_CFG},
   #endif
   #if SN32_HAS_GPIOB
-  {VAL_GPIOB_MODE},
+  {.mode = VAL_GPIOB_MODE, .cfg = VAL_GPIOB_CFG},
   #endif
   #if SN32_HAS_GPIOC
-  {VAL_GPIOC_MODE},
+  {.mode = VAL_GPIOC_MODE, .cfg = VAL_GPIOC_CFG},
   #endif
   #if SN32_HAS_GPIOD
-  {VAL_GPIOD_MODE},
+  {.mode = VAL_GPIOD_MODE, .cfg = VAL_GPIOD_CFG},
   #endif
 };
 #endif
-
-static int flag __attribute__((section(".flag"))) __attribute__((__used__)) = 0xAAAA5555;
 
 /**
  * @brief   Early initialization code.
@@ -53,21 +51,6 @@ static int flag __attribute__((section(".flag"))) __attribute__((__used__)) = 0x
 void __early_init(void) {
   sn32_clock_init();
 }
-
-// void Reset_Handler(void) {
-//     setPinOutput(C4);
-//     setPinInputHigh(A0);
-//     if (readPin(A0) == 0) {
-//         asm ("mov %%sp, %0; bx %1;"
-//                 :
-//                 : "r"(0x200006C8), "r"(0x1fff0009)
-//                 : );
-//     }
-//     asm ("mov %%sp, %0; bx %1;"
-//             :
-//             : "r"(0x200006C8), "r"(0x7801)
-//             : );
-// }
 
 /**
  * @brief   Board-specific initialization code.
