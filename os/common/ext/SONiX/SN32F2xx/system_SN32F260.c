@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <system_SN32F2xx.h>
 #include <mcuconf.h>
-
+#include <sn32_sys1.h>
 
 /*
 //-------- <<< Use Configuration Wizard in Context Menu >>> ------------------
@@ -129,6 +129,7 @@ void SystemCoreClockUpdate (void)            /* Get Core Clock Frequency      */
 	}
 
 	SystemCoreClock /= AHB_prescaler;
+#define SN32_HCLK         SystemCoreClock
 }
 
 /**
@@ -166,10 +167,7 @@ void SystemInit (void)
 
 
 
-	#if (CLKOUT_SEL_VAL > 0)			//CLKOUT
-	SN_SYS1->AHBCLKEN |= (CLKOUT_SEL_VAL<<28);
-	#endif
-	
+  sys1EnableCLKOUT(CLKOUT_SEL_VAL);	
 #endif //(SYS_CLOCK_SETUP)
 
 }

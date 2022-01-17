@@ -114,7 +114,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
     /* Clock activation and timer reset.*/
 #if SN32_PWM_USE_CT16B1
     if (&PWMD1 == pwmp) {
-      CT16B1_Init();
+      sys1EnableCT16B1();
       CT16B1_ResetTimer();
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B1_NUMBER, SN32_PWM_CT16B1_IRQ_PRIORITY);
@@ -488,7 +488,7 @@ void pwm_lld_stop(PWMDriver *pwmp) {
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
       nvicDisableVector(SN32_CT16B1_NUMBER);
 #endif
-      SN_SYS1->AHBCLKEN_b.CT16B1CLKEN = DISABLE;
+      sys1DisableCT16B1();
     }
 #endif
   }

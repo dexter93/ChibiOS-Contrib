@@ -48,7 +48,7 @@ void	CT16B0_NvicDisable (void);
 void CT16B0_Init (void)
 {
 	//Enable P_CLOCK for CT16B0.
-	__CT16B0_ENABLE;
+	sys1EnableCT16B0();
 
 	//CT16B0 PCLK prescalar setting
 	// SN_SYS1->APBCP1_b.CT16B0PRE = 0x00;							//PCLK = HCLK/1

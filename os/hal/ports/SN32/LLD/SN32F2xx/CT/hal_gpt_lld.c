@@ -142,7 +142,7 @@ void gpt_lld_start(GPTDriver *gptp) {
     /* Clock activation.*/
 #if SN32_GPT_USE_CT16B0
     if (&GPTD1 == gptp) {
-      CT16B0_Init();
+      sys1EnableCT16B0();
       CT16B0_ResetTimer();
 #if !defined(SN32_CT16B0_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B0_NUMBER, SN32_GPT_CT16B0_IRQ_PRIORITY);
@@ -153,7 +153,7 @@ void gpt_lld_start(GPTDriver *gptp) {
 
 #if SN32_GPT_USE_CT16B1
     if (&GPTD2 == gptp) {
-      CT16B1_Init();
+      sys1EnableCT16B1();
       CT16B1_ResetTimer();
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B1_NUMBER, SN32_GPT_CT16B1_IRQ_PRIORITY);
@@ -193,7 +193,7 @@ void gpt_lld_stop(GPTDriver *gptp) {
 #if !defined(SN32_CT16B0_SUPPRESS_ISR)
       nvicDisableVector(SN32_CT16B0_NUMBER);
 #endif
-      SN_SYS1->AHBCLKEN_b.CT16B0CLKEN = DISABLE;
+      sys1DisableCT16B0();
     }
 #endif
 
@@ -202,7 +202,7 @@ void gpt_lld_stop(GPTDriver *gptp) {
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
       nvicDisableVector(SN32_CT16B1_NUMBER);
 #endif
-      SN_SYS1->AHBCLKEN_b.CT16B1CLKEN = DISABLE;
+      sys1DisableCT16B1();
     }
 #endif
   }
