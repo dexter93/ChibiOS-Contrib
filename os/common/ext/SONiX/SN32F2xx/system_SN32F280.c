@@ -223,7 +223,7 @@ void SystemCoreClockUpdate (void)            /* Get Core Clock Frequency      */
 	else
 		SN_FLASH->LPCTRL = 0x5AFA0000;
 	//;;;;;;;;; Need for SN32F780 End	;;;;;;;;;
-#define SN32_HCLK         SystemCoreClock
+
 	return;
 }
 

@@ -146,7 +146,6 @@ void SystemCoreClockUpdate (void)            /* Get Core Clock Frequency      */
 	}
 
 	SystemCoreClock /= AHB_prescaler;
-#define SN32_HCLK         SystemCoreClock
 }
 /**
  * Initialize the Flash controller
