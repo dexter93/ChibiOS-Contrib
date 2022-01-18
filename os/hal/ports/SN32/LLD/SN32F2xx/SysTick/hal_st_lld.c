@@ -68,7 +68,7 @@
 #define ST_HANDLER                          SysTick_Handler
 
 #endif /* OSAL_ST_MODE == OSAL_ST_MODE_PERIODIC */
-#define SYSTICK_CK                          SystemCoreClock
+#define SYSTICK_CK                          SN32_HCLK
 
 /*===========================================================================*/
 /* Driver exported variables.                                                */
