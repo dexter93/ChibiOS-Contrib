@@ -119,7 +119,6 @@ void st_lld_init(void) {
   SN32_ST_TIM->MR0    = ST_ARR_INIT;
   SN32_ST_TIM->TMRCTRL = mskCT16_CRST;
   SN32_ST_TIM->IC      &= 0x1FFFFFF;
-  SN32_ST_TIM->MCTRL |= mskCT16_MR0IE_EN;
   SN32_ST_TIM->TMRCTRL |= mskCT16_CEN_EN;
 
   /* IRQ enabled.*/
