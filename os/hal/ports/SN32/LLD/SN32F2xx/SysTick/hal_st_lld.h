@@ -146,7 +146,7 @@ static inline systime_t st_lld_get_counter(void) {
 static inline void st_lld_start_alarm(systime_t abstime) {
   SN32_ST_TIM->MR0 = (uint16_t)abstime;
   SN32_ST_TIM->IC &= 0x1FFFFFF;
-  SN32_ST_TIM->MCTRL = mskCT16_MR0IE_EN;
+  SN32_ST_TIM->MCTRL |= mskCT16_MR0IE_EN;
 }
 
 /**
@@ -155,7 +155,7 @@ static inline void st_lld_start_alarm(systime_t abstime) {
  * @notapi
  */
 static inline void st_lld_stop_alarm(void) {
-  SN32_ST_TIM->MCTRL = mskCT16_MR0IE_DIS;
+  SN32_ST_TIM->MCTRL &= ~mskCT16_MR0IE_EN;
 }
 
 /**
@@ -192,7 +192,7 @@ static inline systime_t st_lld_get_alarm(void) {
  */
 static inline bool st_lld_is_alarm_active(void) {
 
-  return (bool)((SN32_ST_TIM->MCTRL & CT16_MR0IE_EN) != 0);
+  return (bool)((SN32_ST_TIM->MCTRL & mskCT16_MR0IE_EN) != 0);
 }
 
 #endif /* OSAL_ST_MODE == OSAL_ST_MODE_FREERUNNING */

@@ -35,8 +35,6 @@
 #error "Tickless mode on SN32 supports only 16bit timers"
 #endif
 
-#define ST_ARR_INIT                         0x0000FFFFU
-
 #if SN32_ST_USE_TIMER == CT16B0
 
 #if !SN32_HAS_CT16B0
@@ -116,8 +114,6 @@ void st_lld_init(void) {
 
   /* Initializing the counter in free running mode.*/
   SN32_ST_TIM->PRE    = (SYSTICK_CK / OSAL_ST_FREQUENCY) - 1;
-  SN32_ST_TIM->MR0    = ST_ARR_INIT;
-  SN32_ST_TIM->TMRCTRL = mskCT16_CRST;
   SN32_ST_TIM->IC      &= 0x1FFFFFF;
   SN32_ST_TIM->TMRCTRL |= mskCT16_CEN_EN;
 
