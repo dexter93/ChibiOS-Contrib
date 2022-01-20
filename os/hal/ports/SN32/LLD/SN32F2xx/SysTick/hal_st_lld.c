@@ -29,6 +29,8 @@
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
+#define SYSTICK_CK                          SN32_HCLK
+
 #if OSAL_ST_MODE == OSAL_ST_MODE_FREERUNNING
 
 #if (OSAL_ST_RESOLUTION == 32)
@@ -61,14 +63,29 @@
 #error "SN32_ST_USE_TIMER specifies an unsupported timer"
 #endif
 
+#if SYSTICK_CK % OSAL_ST_FREQUENCY != 0
+#error "the selected ST frequency is not obtainable because integer rounding"
+#endif
+
+#if (SYSTICK_CK / OSAL_ST_FREQUENCY) - 1 > 0xFFFF
+#error "the selected ST frequency is not obtainable because CT16 timer counter limits"
+#endif
+
 #endif /* OSAL_ST_MODE == OSAL_ST_MODE_FREERUNNING */
 
 #if OSAL_ST_MODE == OSAL_ST_MODE_PERIODIC
 
 #define ST_HANDLER                          SysTick_Handler
 
+#if SYSTICK_CK % OSAL_ST_FREQUENCY != 0
+#error "the selected ST frequency is not obtainable because integer rounding"
+#endif
+
+#if (SYSTICK_CK / OSAL_ST_FREQUENCY) - 1 > 0xFFFFFF
+#error "the selected ST frequency is not obtainable because SysTick timer counter limits"
+#endif
+
 #endif /* OSAL_ST_MODE == OSAL_ST_MODE_PERIODIC */
-#define SYSTICK_CK                          SN32_HCLK
 
 /*===========================================================================*/
 /* Driver exported variables.                                                */
