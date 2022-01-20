@@ -29,7 +29,7 @@
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
-
+#define GPT_CLK                          SN32_HCLK
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
@@ -147,7 +147,7 @@ void gpt_lld_start(GPTDriver *gptp) {
 #if !defined(SN32_CT16B0_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B0_NUMBER, SN32_GPT_CT16B0_IRQ_PRIORITY);
 #endif
-    gptp->clock = SystemCoreClock;
+    gptp->clock = GPT_CLK;
     }
 #endif
 
@@ -158,7 +158,7 @@ void gpt_lld_start(GPTDriver *gptp) {
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B1_NUMBER, SN32_GPT_CT16B1_IRQ_PRIORITY);
 #endif
-    gptp->clock = SystemCoreClock;
+    gptp->clock = GPT_CLK;
     }
 #endif
   }

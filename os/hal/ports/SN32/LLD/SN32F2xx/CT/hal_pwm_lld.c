@@ -29,7 +29,7 @@
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
-
+#define PWM_CLK                          SN32_HCLK
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
@@ -119,7 +119,7 @@ void pwm_lld_start(PWMDriver *pwmp) {
 #if !defined(SN32_CT16B1_SUPPRESS_ISR)
       nvicEnableVector(SN32_CT16B1_NUMBER, SN32_PWM_CT16B1_IRQ_PRIORITY);
 #endif
-    pwmp->clock = SystemCoreClock;
+    pwmp->clock = PWM_CLK;
     }
 #endif
 

@@ -44,6 +44,7 @@
 #define ST_HANDLER                          SN32_CT16B0_HANDLER
 #define ST_NUMBER                           SN32_CT16B0_NUMBER
 #define ST_ENABLE_CLOCK()                   sys1EnableCT16B0()
+#define ST_INIT_CLOCK()                     CT16B0_ResetTimer()
 
 #elif SN32_ST_USE_TIMER == CT16B1
 
@@ -54,6 +55,7 @@
 #define ST_HANDLER                          SN32_CT16B1_HANDLER
 #define ST_NUMBER                           SN32_CT16B1_NUMBER
 #define ST_ENABLE_CLOCK()                   sys1EnableCT16B1()
+#define ST_INIT_CLOCK()                     CT16B1_ResetTimer()
 
 #else
 #error "SN32_ST_USE_TIMER specifies an unsupported timer"
@@ -111,7 +113,7 @@ void st_lld_init(void) {
 
   /* Enabling timer clock.*/
   ST_ENABLE_CLOCK();
-
+  ST_INIT_CLOCK();
   /* Initializing the counter in free running mode.*/
   SN32_ST_TIM->PRE    = (SYSTICK_CK / OSAL_ST_FREQUENCY) - 1;
   SN32_ST_TIM->IC      &= 0x1FFFFFF;
