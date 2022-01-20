@@ -131,7 +131,8 @@ extern "C" {
  * @notapi
  */
 static inline systime_t st_lld_get_counter(void) {
-  return (systime_t)SN32_ST_TIM->TC;
+  uint32_t counter = SN32_ST_TIM->TC;
+  return (systime_t)counter;
 }
 
 /**
