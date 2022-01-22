@@ -132,7 +132,7 @@ void st_lld_init(void) {
   ST_ENABLE_CLOCK();
   ST_INIT_CLOCK();
   /* Initializing the counter in free running mode.*/
-  SN32_ST_TIM->PRE    = (256) - 1;
+  SN32_ST_TIM->PRE    = (SYSTICK_CK / OSAL_ST_FREQUENCY) - 1;
   SN32_ST_TIM->IC      &= 0x1FFFFFF;
   SN32_ST_TIM->TMRCTRL |= mskCT16_CEN_EN;
 
