@@ -123,7 +123,6 @@ extern "C" {
 
 #if (OSAL_ST_MODE == OSAL_ST_MODE_FREERUNNING) || defined(__DOXYGEN__)
 
-#define SN32_ST_CORR           (SN32_HCLK / SN32_ILRC)
 /**
  * @brief   Returns the time counter value.
  *
@@ -132,7 +131,7 @@ extern "C" {
  * @notapi
  */
 static inline systime_t st_lld_get_counter(void) {
-  return (systime_t)(SN32_ST_CORR * (SN32_ST_TIM->TC & 0x0000FFFF));
+  return (systime_t)(SN32_ST_TIM->TC & 0x0000FFFF);
 }
 
 /**
@@ -145,7 +144,7 @@ static inline systime_t st_lld_get_counter(void) {
  * @notapi
  */
 static inline void st_lld_start_alarm(systime_t abstime) {
-  SN32_ST_TIM->MR0 = (uint32_t)(abstime / SN32_ST_CORR);
+  SN32_ST_TIM->MR0 = (uint32_t)abstime;
   SN32_ST_TIM->IC &= 0x1FFFFFF;
   SN32_ST_TIM->MCTRL |= mskCT16_MR0IE_EN;
 }
@@ -167,7 +166,7 @@ static inline void st_lld_stop_alarm(void) {
  * @notapi
  */
 static inline void st_lld_set_alarm(systime_t abstime) {
-  SN32_ST_TIM->MR0 = (uint32_t)(abstime / SN32_ST_CORR);
+  SN32_ST_TIM->MR0 = (uint32_t)abstime;
 }
 
 /**
@@ -179,7 +178,7 @@ static inline void st_lld_set_alarm(systime_t abstime) {
  */
 static inline systime_t st_lld_get_alarm(void) {
 
-  return (systime_t)(SN32_ST_CORR * (SN32_ST_TIM->TC & 0x0000FFFF));
+  return (systime_t)(SN32_ST_TIM->MR0 & 0x0000FFFF);
 }
 
 /**
