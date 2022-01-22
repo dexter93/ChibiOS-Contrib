@@ -29,7 +29,7 @@
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
 /*===========================================================================*/
-#define SYSTICK_CK                          SN32_ILRC
+#define SYSTICK_CK                          SN32_HCLK
 
 #if OSAL_ST_MODE == OSAL_ST_MODE_FREERUNNING
 
@@ -67,8 +67,8 @@
 #error "the selected ST frequency is not obtainable because integer rounding"
 #endif
 
-#if (SYSTICK_CK / OSAL_ST_FREQUENCY) - 1 > 0xFF
-#error "the selected ST frequency is not obtainable because CT16 timer prescaler limits"
+#if (SYSTICK_CK / OSAL_ST_FREQUENCY) - 1 > 0xFFFF
+#error "the selected ST frequency is not obtainable because CT16 timer counter limits"
 #endif
 
 #endif /* OSAL_ST_MODE == OSAL_ST_MODE_FREERUNNING */
