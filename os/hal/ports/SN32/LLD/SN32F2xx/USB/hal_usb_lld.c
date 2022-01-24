@@ -208,7 +208,7 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
     if(iwIntFlag == 0)
     {
         //@20160902 add for EMC protection
-        USB_ReturntoNormal();
+        __USB_PHY_ENABLE;
         return;
     }
 
@@ -220,7 +220,7 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
         if (iwIntFlag & mskBUS_RESET)
         {
             /* BusReset */
-            USB_ReturntoNormal();
+            __USB_PHY_ENABLE;
             USB_ResetEvent();
             _usb_reset(usbp);
         }
@@ -239,7 +239,7 @@ static void usb_lld_serve_interrupt(USBDriver *usbp)
         else if(iwIntFlag & mskBUS_RESUME)
         {
             /* Resume */
-            USB_ReturntoNormal();
+            __USB_PHY_ENABLE;
             __USB_CLRINSTS(mskBUS_RESUME);
             _usb_wakeup(usbp);
         }
