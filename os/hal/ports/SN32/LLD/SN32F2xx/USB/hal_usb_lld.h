@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    hal_usb_lld.h
- * @brief   PLATFORM USB subsystem low level driver header.
+ * @file    USBv1/hal_usb_lld.h
+ * @brief   SN32 USB subsystem low level driver header.
  *
  * @addtogroup USB
  * @{
@@ -25,14 +25,18 @@
 #ifndef HAL_USB_LLD_H
 #define HAL_USB_LLD_H
 
-#if (HAL_USE_USB == TRUE) || defined(__DOXYGEN__)
+#if HAL_USE_USB || defined(__DOXYGEN__)
 
 #include "sn32_usb.h"
-#include "usbhw.h"
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
 /*===========================================================================*/
+
+/**
+ * @brief   Maximum endpoint address.
+ */
+#define USB_MAX_ENDPOINTS                   USB_ENDPOINTS_NUMBER
 
 /**
  * @brief   Status stage handling method.
@@ -40,9 +44,9 @@
 #define USB_EP0_STATUS_STAGE                USB_EP0_STATUS_STAGE_SW
 
 /**
- * @brief   The address can be changed immediately upon packet reception.
+ * @brief   This device requires the address change after the status packet.
  */
-#define USB_SET_ADDRESS_MODE                USB_EARLY_SET_ADDRESS
+#define USB_SET_ADDRESS_MODE                USB_LATE_SET_ADDRESS
 
 /**
  * @brief   Method for set address acknowledge.
@@ -54,22 +58,49 @@
 /*===========================================================================*/
 
 /**
- * @name    PLATFORM configuration options
- * @{
- */
-/**
- * @brief   USB driver enable switch.
+ * @brief   USB1 driver enable switch.
  * @details If set to @p TRUE the support for USB1 is included.
- * @note    The default is @p FALSE.
+ * @note    The default is @p TRUE.
  */
-#if !defined(PLATFORM_USB_USE_USB1) || defined(__DOXYGEN__)
-#define PLATFORM_USB_USE_USB1                  TRUE
+#if !defined(SN32_USB_USE_USB1) || defined(__DOXYGEN__)
+#define SN32_USB_USE_USB1                  FALSE
 #endif
-/** @} */
+
+/**
+ * @brief   USB1 interrupt priority level setting.
+ */
+#if !defined(SN32_USB_IRQ_PRIORITY) || defined(__DOXYGEN__)
+#define SN32_USB_IRQ_PRIORITY              3
+#endif
+
+/**
+ * @brief   Use faster copy for packets.
+ * @note    Makes the driver larger.
+ */
+#if !defined(SN32_USB_USE_FAST_COPY) || defined(__DOXYGEN__)
+#define SN32_USB_USE_FAST_COPY             FALSE
+#endif
 
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
+
+#if SN32_USB_USE_USB1 && !SN32_HAS_USB
+#error "USB not present in the selected device"
+#endif
+
+#if !SN32_USB_USE_USB1
+#error "USB driver activated but no USB peripheral assigned"
+#endif
+
+#if SN32_USB_USE_USB1 &&                                                   \
+    !OSAL_IRQ_IS_VALID_PRIORITY(SN32_USB_IRQ_PRIORITY)
+#error "Invalid IRQ priority assigned to USB"
+#endif
+
+#if !defined(SN32_USB_HANDLER)
+#error "SN32_USB_HANDLER not defined"
+#endif
 
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
@@ -155,39 +186,36 @@ typedef struct {
   usbepcallback_t               setup_cb;
   /**
    * @brief   IN endpoint notification callback.
-   * @details This field must be set to @p NULL if the IN endpoint is not
-   *          used.
+   * @details This field must be set to @p NULL if callback is not required.
    */
   usbepcallback_t               in_cb;
   /**
    * @brief   OUT endpoint notification callback.
-   * @details This field must be set to @p NULL if the OUT endpoint is not
-   *          used.
+   * @details This field must be set to @p NULL if callback is not required.
    */
   usbepcallback_t               out_cb;
   /**
    * @brief   IN endpoint maximum packet size.
-   * @details This field must be set to zero if the IN endpoint is not
-   *          used.
+   * @details This field must be set to zero if the IN endpoint is not used.
    */
   uint16_t                      in_maxsize;
   /**
    * @brief   OUT endpoint maximum packet size.
-   * @details This field must be set to zero if the OUT endpoint is not
-   *          used.
+   * @details This field must be set to zero if the OUT endpoint is not used.
    */
   uint16_t                      out_maxsize;
   /**
    * @brief   @p USBEndpointState associated to the IN endpoint.
-   * @details This structure maintains the state of the IN endpoint.
+   * @details This field must be set to @p NULL if the IN endpoint is not
+   *          used.
    */
   USBInEndpointState            *in_state;
   /**
    * @brief   @p USBEndpointState associated to the OUT endpoint.
-   * @details This structure maintains the state of the OUT endpoint.
+   * @details This field must be set to @p NULL if the OUT endpoint is not
+   *          used.
    */
   USBOutEndpointState           *out_state;
-  /* End of the mandatory fields.*/
   /* End of the mandatory fields.*/
   /**
    * @brief   Reserved field, not currently used.
@@ -325,7 +353,7 @@ struct USBDriver {
  *
  * @notapi
  */
-#define usb_lld_get_frame_number(usbp) 0
+#define usb_lld_get_frame_number(usbp) (SN32_USB->FRMNO & mskFRAME_NO)
 
 /**
  * @brief   Returns the exact size of a receive transaction.
@@ -344,84 +372,53 @@ struct USBDriver {
 #define usb_lld_get_transaction_size(usbp, ep)                              \
   ((usbp)->epc[ep]->out_state->rxcnt)
 
-/**
- * @brief   Connects the USB device.
- *
- * @api
- */
-#define usb_lld_connect_bus(usbp)
-
-/**
- * @brief   Disconnect the USB device.
- *
- * @api
- */
-#define usb_lld_disconnect_bus(usbp)
 
 /**
  * @brief   Start of host wake-up procedure.
  *
  * @notapi
  */
-#define usb_lld_wakeup_host(usbp) { \
-    USB_RemoteWakeUp();             \
-}
+#define usb_lld_wakeup_host(usbp)                                           \
+  do {                                                                      \
+    SN_USB->SGCTL = (mskBUS_DRVEN|mskBUS_J_STATE);                          \
+    osalThreadSleepMilliseconds(180);                                       \
+    SN_USB->SGCTL = (mskBUS_DRVEN|mskBUS_K_STATE);                          \
+    osalThreadSleepMilliseconds(10);                                        \
+    SN_USB->SGCTL &= ~mskBUS_DRVEN;                                         \
+  } while (false)
 
 /*===========================================================================*/
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-/* Descriptor related */
-/* bmAttributes in Endpoint Descriptor */
-#define USB_ENDPOINT_TYPE_MASK                  0x03
-#define USB_ENDPOINT_TYPE_CONTROL               0x00
-#define USB_ENDPOINT_TYPE_ISOCHRONOUS           0x01
-#define USB_ENDPOINT_TYPE_BULK                  0x02
-#define USB_ENDPOINT_TYPE_INTERRUPT             0x03
-#define USB_ENDPOINT_SYNC_MASK                  0x0C
-#define USB_ENDPOINT_SYNC_NO_SYNCHRONIZATION    0x00
-#define USB_ENDPOINT_SYNC_ASYNCHRONOUS          0x04
-#define USB_ENDPOINT_SYNC_ADAPTIVE              0x08
-#define USB_ENDPOINT_SYNC_SYNCHRONOUS           0x0C
-#define USB_ENDPOINT_USAGE_MASK                 0x30
-#define USB_ENDPOINT_USAGE_DATA                 0x00
-#define USB_ENDPOINT_USAGE_FEEDBACK             0x10
-#define USB_ENDPOINT_USAGE_IMPLICIT_FEEDBACK    0x20
-#define USB_ENDPOINT_USAGE_RESERVED             0x30
-
-/* bEndpointAddress in Endpoint Descriptor */
-#define USB_ENDPOINT_DIRECTION_MASK             0x80
-
-#if (PLATFORM_USB_USE_USB1 == TRUE) && !defined(__DOXYGEN__)
+#if SN32_USB_USE_USB1 && !defined(__DOXYGEN__)
 extern USBDriver USBD1;
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-    void usb_lld_init(void);
-    void usb_lld_start(USBDriver *usbp);
-    void usb_lld_stop(USBDriver *usbp);
-    void usb_lld_reset(USBDriver *usbp);
-    void usb_lld_set_address(USBDriver *usbp);
-    void usb_lld_init_endpoint(USBDriver *usbp, usbep_t ep);
-    void usb_lld_disable_endpoints(USBDriver *usbp);
-    usbepstatus_t usb_lld_get_status_in(USBDriver *usbp, usbep_t ep);
-    usbepstatus_t usb_lld_get_status_out(USBDriver *usbp, usbep_t ep);
-    void usb_lld_read_setup(USBDriver *usbp, usbep_t ep, uint8_t *buf);
-    void usb_lld_prepare_receive(USBDriver *usbp, usbep_t ep);
-    void usb_lld_prepare_transmit(USBDriver *usbp, usbep_t ep);
-    void usb_lld_start_out(USBDriver *usbp, usbep_t ep);
-    void usb_lld_start_in(USBDriver *usbp, usbep_t ep);
-    void usb_lld_stall_out(USBDriver *usbp, usbep_t ep);
-    void usb_lld_stall_in(USBDriver *usbp, usbep_t ep);
-    void usb_lld_clear_out(USBDriver *usbp, usbep_t ep);
-    void usb_lld_clear_in(USBDriver *usbp, usbep_t ep);
+  void usb_lld_init(void);
+  void usb_lld_start(USBDriver *usbp);
+  void usb_lld_stop(USBDriver *usbp);
+  void usb_lld_reset(USBDriver *usbp);
+  void usb_lld_set_address(USBDriver *usbp);
+  void usb_lld_init_endpoint(USBDriver *usbp, usbep_t ep);
+  void usb_lld_disable_endpoints(USBDriver *usbp);
+  usbepstatus_t usb_lld_get_status_in(USBDriver *usbp, usbep_t ep);
+  usbepstatus_t usb_lld_get_status_out(USBDriver *usbp, usbep_t ep);
+  void usb_lld_read_setup(USBDriver *usbp, usbep_t ep, uint8_t *buf);
+  void usb_lld_start_out(USBDriver *usbp, usbep_t ep);
+  void usb_lld_start_in(USBDriver *usbp, usbep_t ep);
+  void usb_lld_stall_out(USBDriver *usbp, usbep_t ep);
+  void usb_lld_stall_in(USBDriver *usbp, usbep_t ep);
+  void usb_lld_clear_out(USBDriver *usbp, usbep_t ep);
+  void usb_lld_clear_in(USBDriver *usbp, usbep_t ep);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* HAL_USE_USB == TRUE */
+#endif /* HAL_USE_USB */
 
 #endif /* HAL_USB_LLD_H */
 
