@@ -300,12 +300,17 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
   if (status & (mskEP0_SETUP | mskEP0_OUT | mskEPn_NAK(ep) | mskEPn_ACK(ep))) {
         if((ep == 0) | (ep_out)) {
           /* OUT endpoint, receive.*/
-
-          if (status & mskEP0_SETUP) {
-            /* Setup packets handling, setup packets are handled using a
-               specific callback.*/
-            _usb_isr_invoke_setup_cb(usbp, ep);
-            SN32_USB->INSTSC = ((mskEP0_SETUP|mskEP0_PRESETUP));
+          if(status & mskEP0_SETUP) {
+              if (!(status & mskERR_SETUP)) {
+                SN32_USB->INSTSC = (mskEP0_SETUP | mskEP0_PRESETUP | mskEP0_OUT_STALL | mskEP0_IN_STALL);
+                /* Setup packets handling, setup packets are handled using a
+                   specific callback.*/
+                _usb_isr_invoke_setup_cb(usbp, ep);
+              }
+              else {
+                SN32_USB->INSTSC = mskERR_SETUP;
+                usb_lld_stall_out(usbp, ep);
+              }
           }
           else {
             USBOutEndpointState *osp = epcp->out_state;
@@ -389,7 +394,7 @@ OSAL_IRQ_HANDLER(SN32_USB_HANDLER) {
   }
 
   /* Endpoint 0 events handling.*/
-  if (insts & (mskEP0_IN | mskEP0_OUT | mskEP0_SETUP)) {
+  if (insts & (mskEP0_IN | mskEP0_OUT | mskEP0_SETUP | mskEP0_PRESETUP | mskEP0_OUT_STALL | mskEP0_IN_STALL)) {
     usb_serve_endpoints(usbp, 0);
   }
 
@@ -492,7 +497,7 @@ void usb_lld_reset(USBDriver *usbp) {
   /* Post reset initialization.*/
   SN32_USB->INSTSC = (0xFFFFFFFF);
   SN32_USB->ADDR  = 0;
-
+  usb_lld_stall_out(usbp, 0);
   /* Resets the packet memory allocator.*/
   usb_pm_reset(usbp);
 
@@ -713,8 +718,13 @@ void usb_lld_start_in(USBDriver *usbp, usbep_t ep) {
 void usb_lld_stall_out(USBDriver *usbp, usbep_t ep) {
 
   (void)usbp;
-
-  SN32_USB->EPCTL[ep] |= mskEPn_ENDP_STATE_STALL;
+  uint32_t presetup = (SN32_USB->INSTS & mskEP0_PRESETUP);
+  if((ep ==0) && !presetup) {
+    SN32_USB->EPCTL[ep] |= mskEPn_ENDP_STATE_STALL;
+  }
+  else if (ep !=0){
+      SN32_USB->EPCTL[ep] |= mskEPn_ENDP_STATE_STALL;
+  }
 }
 
 /**
@@ -728,8 +738,14 @@ void usb_lld_stall_out(USBDriver *usbp, usbep_t ep) {
 void usb_lld_stall_in(USBDriver *usbp, usbep_t ep) {
 
   (void)usbp;
+  uint32_t presetup = (SN32_USB->INSTS & mskEP0_PRESETUP);
+  if((ep ==0) && !presetup) {
+    SN32_USB->EPCTL[ep] |= mskEPn_ENDP_STATE_STALL;
+  }
+  else if (ep !=0){
+      SN32_USB->EPCTL[ep] |= mskEPn_ENDP_STATE_STALL;
+  }
 
-  SN32_USB->EPCTL[ep] |= mskEPn_ENDP_STATE_STALL;
 }
 
 /**
