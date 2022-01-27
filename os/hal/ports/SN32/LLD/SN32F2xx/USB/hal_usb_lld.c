@@ -363,14 +363,14 @@ OSAL_IRQ_HANDLER(SN32_USB_HANDLER) {
 
   /* USB bus reset condition handling.*/
   if (insts & mskBUS_RESET) {
-    SN32_USB->INSTS = ~mskBUS_RESET;
+    SN32_USB->INSTSC = mskBUS_RESET;
 
     _usb_reset(usbp);
   }
 
   /* USB bus SUSPEND condition handling.*/
   if (insts & mskBUS_SUSPEND) {
-    SN32_USB->INSTS = ~mskBUS_SUSPEND;
+    SN32_USB->INSTSC = mskBUS_SUSPEND;
     SN32_USB->CFG &= ~(mskESD_EN|mskPHY_EN);
     _usb_suspend(usbp);
   }
@@ -379,13 +379,13 @@ OSAL_IRQ_HANDLER(SN32_USB_HANDLER) {
   if (insts & mskBUS_WAKEUP) {
     SN32_USB->CFG |= (mskESD_EN|mskPHY_EN);
     _usb_wakeup(usbp);
-    SN32_USB->INSTS = ~mskBUS_WAKEUP;
+    SN32_USB->INSTSC = mskBUS_WAKEUP;
   }
 
   /* SOF handling.*/
   if (insts & mskUSB_SOF) {
     _usb_isr_invoke_sof_cb(usbp);
-    SN32_USB->INSTS = ~mskUSB_SOF;
+    SN32_USB->INSTSC = mskUSB_SOF;
   }
 
   /* Endpoint 0 events handling.*/
