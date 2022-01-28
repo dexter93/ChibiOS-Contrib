@@ -138,7 +138,7 @@ typedef struct {
  */
 #define USB_GET_DESCRIPTOR(ep)                                            \
   ((sn32_usb_descriptor_t *)((uint32_t)SN32_USBRAM_BASE +                 \
-                              (uint32_t)SN32_USB->EPBUFOS[ep] +           \
+                              (uint32_t)SN32_USB->EPBUFOS[ep-1] +         \
                               sizeof(sn32_usb_descriptor_t)))
 #define USB_GET_CTRL_DESCRIPTOR()                                         \
   ((sn32_usb_descriptor_t *)((uint32_t)SN32_USBRAM_BASE +                 \
