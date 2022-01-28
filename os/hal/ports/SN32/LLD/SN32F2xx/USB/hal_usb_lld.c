@@ -271,6 +271,20 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
   uint8_t ep_out = (cfg & mskEPn_DIR(ep)) == mskEPn_DIR(ep);
   const USBEndpointConfig *epcp = usbp->epc[ep];
 
+  if(status & (mskEP0_SETUP | mskEP0_OUT_STALL | mskEP0_IN_STALL | mskERR_SETUP)) {
+      if (!(status & mskERR_SETUP)) {
+        SN32_USB->INSTSC = (mskEP0_SETUP | mskEP0_PRESETUP | mskEP0_OUT_STALL | mskEP0_IN_STALL);
+        /* Setup packets handling, setup packets are handled using a
+           specific callback.*/
+        (usbp)->receiving &= ~1;
+        _usb_isr_invoke_setup_cb(usbp, 0);
+      }
+      else {
+        SN32_USB->INSTSC = mskERR_SETUP;
+        usb_lld_stall_out(usbp, 0);
+      }
+  }
+
   if (status & (mskEP0_IN | mskEPn_NAK(ep) | mskEPn_ACK(ep))) {
     if((ep == 0 ) | (!ep_out)) {
 
@@ -319,22 +333,9 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
       }
     }
   }
-  if (status & (mskEP0_SETUP | mskEP0_OUT | mskEP0_IN_STALL| mskEP0_OUT_STALL | mskEPn_NAK(ep) | mskEPn_ACK(ep))) {
+  if (status & (mskEP0_OUT | mskEPn_NAK(ep) | mskEPn_ACK(ep))) {
         if((ep == 0) | (ep_out)) {
           /* OUT endpoint, receive.*/
-          if(status & mskEP0_SETUP) {
-              if (!(status & mskERR_SETUP)) {
-                SN32_USB->INSTSC = (mskEP0_SETUP | mskEP0_PRESETUP | mskEP0_OUT_STALL | mskEP0_IN_STALL);
-                /* Setup packets handling, setup packets are handled using a
-                   specific callback.*/
-                _usb_isr_invoke_setup_cb(usbp, 0);
-              }
-              else {
-                SN32_USB->INSTSC = mskERR_SETUP;
-                usb_lld_stall_out(usbp, 0);
-              }
-          }
-          else {
             USBOutEndpointState *osp = epcp->out_state;
 
             /* Reads the packet into the defined buffer.*/
@@ -365,7 +366,6 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
             else if (status & mskEPn_ACK(ep)) {
               SN32_USB->INSTSC = (mskEPn_ACK(ep));
             }
-          }
         }
     }
 }
