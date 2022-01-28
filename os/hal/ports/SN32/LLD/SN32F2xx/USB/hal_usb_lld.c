@@ -126,7 +126,12 @@ static uint32_t usb_pm_alloc(USBDriver *usbp, size_t size) {
  */
 static size_t usb_packet_read_to_buffer(usbep_t ep, uint8_t *buf) {
   size_t i, n;
-  sn32_usb_descriptor_t *udp = USB_GET_DESCRIPTOR(ep);
+  if(ep == 0) {
+    sn32_usb_descriptor_t *udp = USB_GET_CTRL_DESCRIPTOR();
+  }
+  else {
+    sn32_usb_descriptor_t *udp = USB_GET_DESCRIPTOR(ep);
+  }
   sn32_usb_pma_t *pmap = USB_ADDR2PTR(udp->RXADDR0);
   n = (size_t)udp->RXCOUNT0 & RXCOUNT_COUNT_MASK;
   i = n;
@@ -193,7 +198,12 @@ static size_t usb_packet_read_to_buffer(usbep_t ep, uint8_t *buf) {
 static void usb_packet_write_from_buffer(usbep_t ep,
                                          const uint8_t *buf,
                                          size_t n) {
-  sn32_usb_descriptor_t *udp = USB_GET_DESCRIPTOR(ep);
+  if(ep == 0) {
+    sn32_usb_descriptor_t *udp = USB_GET_CTRL_DESCRIPTOR();
+  }
+  else {
+    sn32_usb_descriptor_t *udp = USB_GET_DESCRIPTOR(ep);
+  }
   sn32_usb_pma_t *pmap = USB_ADDR2PTR(udp->TXADDR0);
   int i = (int)n;
 
@@ -531,7 +541,12 @@ void usb_lld_init_endpoint(USBDriver *usbp, usbep_t ep) {
   sn32_usb_descriptor_t *dp;
   const USBEndpointConfig *epcp = usbp->epc[ep];
 
-  dp = USB_GET_DESCRIPTOR(ep);
+  if(ep == 0) {
+    dp = USB_GET_CTRL_DESCRIPTOR();
+  }
+  else {
+    dp = USB_GET_DESCRIPTOR(ep);
+  }
 
   /* IN endpoint handling.*/
   if (epcp->in_state != NULL) {
@@ -655,7 +670,12 @@ void usb_lld_read_setup(USBDriver *usbp, usbep_t ep, uint8_t *buf) {
   uint32_t n;
 
   (void)usbp;
-  udp = USB_GET_DESCRIPTOR(ep);
+  if(ep == 0) {
+    udp = USB_GET_CTRL_DESCRIPTOR();
+  }
+  else {
+    udp = USB_GET_DESCRIPTOR(ep);
+  }
   pmap = USB_ADDR2PTR(udp->RXADDR0);
   for (n = 0; n < 4; n++) {
     *(uint16_t *)buf = (uint16_t)*pmap++;

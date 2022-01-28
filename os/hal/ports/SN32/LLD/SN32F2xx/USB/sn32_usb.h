@@ -140,6 +140,9 @@ typedef struct {
   ((sn32_usb_descriptor_t *)((uint32_t)SN32_USBRAM_BASE +                 \
                               (uint32_t)SN32_USB->EPBUFOS[ep] +           \
                               sizeof(sn32_usb_descriptor_t)))
+#define USB_GET_CTRL_DESCRIPTOR()                                         \
+  ((sn32_usb_descriptor_t *)((uint32_t)SN32_USBRAM_BASE +                 \
+                              sizeof(sn32_usb_descriptor_t)))
 
 /**
  * @brief   Converts from a PMA address to a physical address.
