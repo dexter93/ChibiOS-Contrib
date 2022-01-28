@@ -517,6 +517,9 @@ void usb_lld_stop(USBDriver *usbp) {
 void usb_lld_reset(USBDriver *usbp) {
 
   /* Post reset initialization.*/
+  for(int i=1;i <= USB_ENDPOINTS_NUMBER; i++){
+    SN32_USB->EPBUFOS[i-1] = (0x40 * i);
+  }
   SN32_USB->INSTSC = (0xFFFFFFFF);
   SN32_USB->ADDR  = 0;
   usb_lld_stall_out(usbp, 0);
