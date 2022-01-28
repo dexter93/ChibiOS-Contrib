@@ -272,7 +272,7 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
   const USBEndpointConfig *epcp = usbp->epc[ep];
 
   if (status & (mskEP0_IN | mskEPn_NAK(ep) | mskEPn_ACK(ep))) {
-    if((ep == 0 )| (!ep_out)) {
+    if((ep == 0 ) | (!ep_out)) {
 
       /* Special case for SetAddress for EP0 */
       if(ep == 0 && (((uint16_t)usbp->setup[0]<<8)|usbp->setup[1]) == 0x0500)
@@ -319,7 +319,7 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
       }
     }
   }
-  if (status & (mskEP0_SETUP | mskEP0_OUT | mskEPn_NAK(ep) | mskEPn_ACK(ep))) {
+  if (status & (mskEP0_SETUP | mskEP0_OUT | mskEP0_IN_STALL| mskEP0_OUT_STALL | mskEPn_NAK(ep) | mskEPn_ACK(ep))) {
         if((ep == 0) | (ep_out)) {
           /* OUT endpoint, receive.*/
           if(status & mskEP0_SETUP) {
@@ -327,11 +327,11 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
                 SN32_USB->INSTSC = (mskEP0_SETUP | mskEP0_PRESETUP | mskEP0_OUT_STALL | mskEP0_IN_STALL);
                 /* Setup packets handling, setup packets are handled using a
                    specific callback.*/
-                _usb_isr_invoke_setup_cb(usbp, ep);
+                _usb_isr_invoke_setup_cb(usbp, 0);
               }
               else {
                 SN32_USB->INSTSC = mskERR_SETUP;
-                usb_lld_stall_out(usbp, ep);
+                usb_lld_stall_out(usbp, 0);
               }
           }
           else {
