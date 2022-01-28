@@ -537,7 +537,7 @@ void usb_lld_reset(USBDriver *usbp) {
  */
 void usb_lld_set_address(USBDriver *usbp) {
 
-  SN32_USB->ADDR = (uint8_t)(usbp->address);
+  SN32_USB->ADDR = (uint32_t)(usbp->address) | mskUADDR;
 }
 
 /**
