@@ -295,6 +295,7 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
         usb_lld_set_address(usbp);
         _usb_isr_invoke_event_cb(usbp, USB_EVENT_ADDRESS);
         usbp->state = USB_SELECTED;
+        usb_lld_stall_in(usbp, 0);
       }
 
       /* IN endpoint, transmission.*/
