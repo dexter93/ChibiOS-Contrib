@@ -273,6 +273,16 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
 
   if (status & (mskEP0_IN | mskEPn_NAK(ep) | mskEPn_ACK(ep))) {
     if((ep == 0 )| (!ep_out)) {
+
+      /* Special case for SetAddress for EP0 */
+      if(ep == 0 && (((uint16_t)usbp->setup[0]<<8)|usbp->setup[1]) == 0x0500)
+      {
+        usbp->address = usbp->setup[2];
+        usb_lld_set_address(usbp);
+        _usb_isr_invoke_event_cb(usbp, USB_EVENT_ADDRESS);
+        usbp->state = USB_SELECTED;
+      }
+
       /* IN endpoint, transmission.*/
       USBInEndpointState *isp = epcp->in_state;
 
