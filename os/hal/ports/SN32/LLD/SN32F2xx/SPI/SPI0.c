@@ -43,16 +43,16 @@ void SPI0_Init(void)
 
 	//SPI0 setting
 	SN_SPI0->CTRL0_b.DL = SPI_DL_8;									//3 ~ 16 Data length
-#if defined(SPI_MASTER_MODE)
-	SN_SPI0->CTRL0_b.MS = SPI_MS_MASTER_MODE;				//Master/Slave selection bit
-#elif defined(SPI_SLAVE_MODE)
+#if defined(SN32_SPI_SLAVE_MODE)
 	SN_SPI0->CTRL0_b.MS = SPI_MS_SLAVE_MODE;				//Master/Slave selection bit
+#else
+	SN_SPI0->CTRL0_b.MS = SPI_MS_MASTER_MODE;				//Master/Slave selection bit
 #endif
 	SN_SPI0->CTRL0_b.LOOPBACK = SPI_LOOPBACK_DIS; 	//Loop back mode
 	SN_SPI0->CTRL0_b.SDODIS = SPI_SDODIS_EN; 				//Slave data output 
 																									//(ONLY used in slave mode)
-#if defined(SPI_DIVIDER)
-	SN_SPI0->CLKDIV_b.DIV = SPI_DIVIDER;						//SPIn clock divider
+#if defined(SN32_SPI_DIVIDER)
+	SN_SPI0->CLKDIV_b.DIV = SN32_SPI_DIVIDER;						//SPIn clock divider
 #else
 	SN_SPI0->CLKDIV_b.DIV = (SPI_DIV / 2) - 1;			//SPIn clock divider
 #endif
@@ -63,7 +63,7 @@ void SPI0_Init(void)
 									 mskSPI_MLSB_MSB;								//MSB/LSB selection bit
 
 	//SPI0 SEL0 setting
-#if defined(SPI_ENABLE_AUTOSEL)
+#if defined(SN32_SPI_ENABLE_AUTOSEL)
 	SN_SPI0->CTRL0_b.SELDIS = SPI_SELDIS_DIS; 				//Auto-SEL disable bit
 #else
 	SN_SPI0->CTRL0_b.SELDIS = SPI_SELDIS_EN; 					//Auto-SEL disable bit
@@ -80,6 +80,9 @@ void SPI0_Init(void)
 	}
 
 	nvicDisableVector(SN32_SPI0_NUMBER);
+#if defined(SN32_SPI_IRQ_PIN)
+	palClearLine(SN32_SPI_IRQ_PIN);
+#endif
 
 	//SPI0 enable	
 	SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_EN;    			//SPI enable bit	
@@ -112,4 +115,94 @@ void SPI0_Disable(void)
 {
   SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_DIS;    		//SPI disable bit
 	sys1DisableSPI0();															//Disable clock for SPI0.
+}
+/*****************************************************************************
+* Function		: SPI0_Send_Init
+* Description	: SPI0 Send Init function
+* Input			: None
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_Send_Init(void)
+{
+#if defined(SN32_SPI_IRQ_PIN)
+	palSetLine(SN32_SPI_IRQ_PIN);
+#endif
+}
+/*****************************************************************************
+* Function		: SPI0_Send_End
+* Description	: SPI0 Send End function
+* Input			: None
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_Send_End(void)
+{
+	while (!SN_SPI0->STAT_b.TX_EMPTY);
+#if defined(SN32_SPI_IRQ_PIN)
+	palClearLine(SN32_SPI_IRQ_PIN);
+#endif
+}
+/*****************************************************************************
+* Function		: SPI0_Flush
+* Description	: SPI0 Flush function
+* Input			: None
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_Flush(void)
+{
+	while (SN_SPI0->STAT_b.BUSY);
+}
+/*****************************************************************************
+* Function		: SPI0_Write
+* Description	: SPI0 Write data
+* Input			: p pointer to data, length len
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_Write(unsigned char *p, int len)
+{
+	for (int i = 0; i < len; i++) {
+		while (!SN_SPI0->STAT_b.TX_EMPTY);
+		SN_SPI0->DATA_b.Data = *p++;
+	}
+	SPI0_Flush();
+}
+/*****************************************************************************
+* Function		: SPI0_Write1
+* Description	: SPI0 Write single packet
+* Input			: data
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_Write1(uint8_t data)
+{
+	while (!SN_SPI0->STAT_b.TX_EMPTY);
+	SN_SPI0->DATA_b.Data = data;
+}
+/*****************************************************************************
+* Function		: SPI0_Read3
+* Description	: SPI0 Request data at address
+* Input			: header b1, address b2, data pointer b3
+* Output		: None
+* Return		: None
+* Note			: None
+*****************************************************************************/
+void SPI0_Read3(unsigned char b1, unsigned char b2, unsigned char *b3)
+{
+	/* write first 2 bytes: header and address */
+	while (!SN_SPI0->STAT_b.TX_EMPTY);
+	SN_SPI0->DATA_b.Data = b1;
+	SN_SPI0->DATA_b.Data = b2;
+	/* read 1 byte data */
+	SPI0_Flush();
+	while (SN_SPI0->STAT_b.RX_EMPTY);
+	*b3 = SN_SPI0->DATA_b.Data;
+	SPI0_Flush();
 }

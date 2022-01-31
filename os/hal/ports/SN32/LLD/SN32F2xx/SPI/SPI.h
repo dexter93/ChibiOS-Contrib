@@ -202,6 +202,12 @@ Base Address: 0x4001 C000 (SPI0)
 void SPI0_Init(void);
 void SPI0_Enable(void);
 void SPI0_Disable(void);
+void SPI0_Send_Init(void)
+void SPI0_Send_End(void);
+void SPI0_Write(unsigned char *p, int len);
+void SPI0_Write1(uint8_t data);
+void SPI0_Flush(void);
+void SPI0_Read3(unsigned char b1, unsigned char b2, unsigned char *b3);
 
 void SPI1_Init(void);
 void SPI1_Enable(void);
