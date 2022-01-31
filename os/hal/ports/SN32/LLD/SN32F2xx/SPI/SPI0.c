@@ -51,7 +51,7 @@ void SPI0_Init(void) {
 	SN_SPI0->CTRL0_b.SDODIS = SPI_SDODIS_EN; 				//Slave data output 
 																									//(ONLY used in slave mode)
 #if defined(SN32_SPI_DIVIDER)
-	SN_SPI0->CLKDIV_b.DIV = SN32_SPI_DIVIDER;						//SPIn clock divider
+	SN_SPI0->CLKDIV_b.DIV = SN32_SPI_DIVIDER;				//SPIn clock divider
 #else
 	SN_SPI0->CLKDIV_b.DIV = (SPI_DIV / 2) - 1;			//SPIn clock divider
 #endif

@@ -42,17 +42,17 @@ void SPI1_Init(void) {
 
 	//SPI1 setting
 	SN_SPI1->CTRL0_b.DL = SPI_DL_8;									//3 ~ 16 Data length
-#if defined(SPI_MASTER_MODE)
-	SN_SPI1->CTRL0_b.MS = SPI_MS_MASTER_MODE;				//Master/Slave selection bit
-#elif defined(SPI_SLAVE_MODE)
+#if defined(SN32_SPI_SLAVE_MODE)
 	SN_SPI1->CTRL0_b.MS = SPI_MS_SLAVE_MODE;				//Master/Slave selection bit
+#else
+	SN_SPI1->CTRL0_b.MS = SPI_MS_MASTER_MODE;				//Master/Slave selection bit
 #endif
 	SN_SPI1->CTRL0_b.LOOPBACK = SPI_LOOPBACK_DIS; 	//Loop back mode
 	SN_SPI1->CTRL0_b.SDODIS = SPI_SDODIS_EN; 				//Slave data output 
 																									//(ONLY used in slave mode)
 																									
-#if defined(SPI_DIVIDER)
-	SN_SPI1->CLKDIV_b.DIV = SPI_DIVIDER;						//SPIn clock divider
+#if defined(SN32_SPI_DIVIDER)
+	SN_SPI1->CLKDIV_b.DIV = SN32_SPI_DIVIDER;				//SPIn clock divider
 #else
 	SN_SPI1->CLKDIV_b.DIV = (SPI_DIV / 2) - 1;			//SPIn clock divider
 #endif
@@ -63,7 +63,7 @@ void SPI1_Init(void) {
 									 mskSPI_MLSB_MSB;								//MSB/LSB selection bit
 
 	//SPI1 SEL0 setting
-#if defined(SPI_ENABLE_AUTOSEL)
+#if defined(SN32_SPI_ENABLE_AUTOSEL)
 	SN_SPI1->CTRL0_b.SELDIS = SPI_SELDIS_DIS; 				//Auto-SEL disable bit
 #else
 	SN_SPI1->CTRL0_b.SELDIS = SPI_SELDIS_EN; 					//Auto-SEL disable bit
@@ -74,7 +74,7 @@ void SPI1_Init(void) {
 	//SPI1 Fifo reset
 	__SPI1_FIFO_RESET;
 	
-	uint32_t spiClock = (SN32_HCLK / (SN_SPI0->CLKDIV_b.DIV + 2));
+	uint32_t spiClock = (SN32_HCLK / (SN_SPI1->CLKDIV_b.DIV + 2));
 	if(spiClock >6000000){
 	__SPI1_DATA_FETCH_HIGH_SPEED;									//Enable if Freq. of SCK > 6MHz
 	}
