@@ -36,8 +36,7 @@
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Init(void)
-{
+void SPI0_Init(void) {
 	//Enable HCLK for SPI0
 	sys1EnableSPI0();																//Enable clock for SPI0.
 
@@ -87,7 +86,6 @@ void SPI0_Init(void)
 	//SPI0 enable	
 	SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_EN;    			//SPI enable bit	
 }
-
 /*****************************************************************************
 * Function		: SPI0_Enable
 * Description	: SPI0 enable setting
@@ -96,13 +94,11 @@ void SPI0_Init(void)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Enable(void)
-{
+void SPI0_Enable(void) {
 	sys1EnableSPI0();																//Enable clock for SPI0.
   SN_SPI0->CTRL0_b.SPIEN = SPI_SPIEN_EN;    			//SPI enable bit
 	__SPI0_FIFO_RESET;
 }
-
 /*****************************************************************************
 * Function		: SPI0_Disable
 * Description	: SPI0 disable setting
@@ -111,8 +107,7 @@ void SPI0_Enable(void)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Disable(void)
-{
+void SPI0_Disable(void) {
   SN_SPI0->CTRL0_b.SPIEN  = SPI_SPIEN_DIS;    		//SPI disable bit
 	sys1DisableSPI0();															//Disable clock for SPI0.
 }
@@ -124,8 +119,7 @@ void SPI0_Disable(void)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Send_Init(void)
-{
+void SPI0_Send_Init(void) {
 #if defined(SN32_SPI_IRQ_PIN)
 	palSetLine(SN32_SPI_IRQ_PIN);
 #endif
@@ -138,8 +132,7 @@ void SPI0_Send_Init(void)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Send_End(void)
-{
+void SPI0_Send_End(void) {
 	while (!SN_SPI0->STAT_b.TX_EMPTY);
 #if defined(SN32_SPI_IRQ_PIN)
 	palClearLine(SN32_SPI_IRQ_PIN);
@@ -153,8 +146,7 @@ void SPI0_Send_End(void)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Flush(void)
-{
+void SPI0_Flush(void) {
 	while (SN_SPI0->STAT_b.BUSY);
 }
 /*****************************************************************************
@@ -165,8 +157,7 @@ void SPI0_Flush(void)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Write(unsigned char *p, int len)
-{
+void SPI0_Write(unsigned char *p, int len) {
 	for (int i = 0; i < len; i++) {
 		while (!SN_SPI0->STAT_b.TX_EMPTY);
 		SN_SPI0->DATA_b.Data = *p++;
@@ -181,8 +172,7 @@ void SPI0_Write(unsigned char *p, int len)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Write1(uint8_t data)
-{
+void SPI0_Write1(uint8_t data) {
 	while (!SN_SPI0->STAT_b.TX_EMPTY);
 	SN_SPI0->DATA_b.Data = data;
 }
@@ -194,8 +184,7 @@ void SPI0_Write1(uint8_t data)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI0_Read3(unsigned char b1, unsigned char b2, unsigned char *b3)
-{
+void SPI0_Read3(unsigned char b1, unsigned char b2, unsigned char *b3) {
 	/* write first 2 bytes: header and address */
 	while (!SN_SPI0->STAT_b.TX_EMPTY);
 	SN_SPI0->DATA_b.Data = b1;

@@ -36,8 +36,7 @@
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI1_Init(void)
-{
+void SPI1_Init(void) {
 	//Enable HCLK for SPI1
 	sys1EnableSPI1();																//Enable clock for SPI1.
 
@@ -85,7 +84,6 @@ void SPI1_Init(void)
 	//SPI1 enable	
 	SN_SPI1->CTRL0_b.SPIEN  = SPI_SPIEN_EN;    			//SPI enable bit	
 }
-
 /*****************************************************************************
 * Function		: SPI1_Enable
 * Description	: SPI1 enable setting
@@ -94,8 +92,7 @@ void SPI1_Init(void)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI1_Enable(void)
-{
+void SPI1_Enable(void) {
 	sys1EnableSPI1();																//Enable clock for SPI1.
   SN_SPI1->CTRL0_b.SPIEN = SPI_SPIEN_EN;    			//SPI enable bit
 	__SPI1_FIFO_RESET;
@@ -109,8 +106,7 @@ void SPI1_Enable(void)
 * Return		: None
 * Note			: None
 *****************************************************************************/
-void SPI1_Disable(void)
-{
+void SPI1_Disable(void) {
   SN_SPI1->CTRL0_b.SPIEN  = SPI_SPIEN_DIS;    		//SPI disable bit
 	sys1DisableSPI1();															//Disable clock for SPI1.
 }

@@ -2,9 +2,7 @@
 #define __SN32F2XX_SPI_H
 
 /*_____ I N C L U D E S ____________________________________________________*/
-#include <SN32F2xx.h>
-#include <sn32_sys1.h>
-
+#include "hal.h"
 /*_____ D E F I N I T I O N S ______________________________________________*/
 /*
 Base Address: 0x4001 C000 (SPI0)
@@ -202,7 +200,7 @@ Base Address: 0x4001 C000 (SPI0)
 void SPI0_Init(void);
 void SPI0_Enable(void);
 void SPI0_Disable(void);
-void SPI0_Send_Init(void)
+void SPI0_Send_Init(void);
 void SPI0_Send_End(void);
 void SPI0_Write(unsigned char *p, int len);
 void SPI0_Write1(uint8_t data);
