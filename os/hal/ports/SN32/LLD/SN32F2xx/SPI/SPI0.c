@@ -50,6 +50,12 @@ void SPI0_Init(void) {
 	SN_SPI0->CTRL0_b.LOOPBACK = SPI_LOOPBACK_DIS; 	//Loop back mode
 	SN_SPI0->CTRL0_b.SDODIS = SPI_SDODIS_EN; 				//Slave data output 
 																									//(ONLY used in slave mode)
+#if defined(SN32_SPI_RXFIFO_THRESHOLD)						//Override hw default of 0
+	SN_SPI0->CTRL0_b.RXFIFOTH       = SN32_SPI_RXFIFO_THRESHOLD;
+#endif
+#if defined(SN32_SPI_TXFIFO_THRESHOLD)						//Override hw default of 0
+	SN_SPI0->CTRL0_b.TXFIFOTH       = SN32_SPI_TXFIFO_THRESHOLD;
+#endif
 #if defined(SN32_SPI_DIVIDER)
 	SN_SPI0->CLKDIV_b.DIV = SN32_SPI_DIVIDER;				//SPIn clock divider
 #else
