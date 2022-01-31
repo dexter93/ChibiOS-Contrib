@@ -133,8 +133,8 @@ static size_t usb_packet_read_to_buffer(usbep_t ep, uint8_t *buf) {
   else {
     udp = USB_GET_DESCRIPTOR(ep);
   }
-  sn32_usb_pma_t *pmap = USB_ADDR2PTR(udp->RXADDR0);
-  n = (size_t)udp->RXCOUNT0 & RXCOUNT_COUNT_MASK;
+  sn32_usb_pma_t *pmap = USB_ADDR2PTR(udp->RWADDR);
+  n = (size_t)SN32_USB->EPCTL[ep] & mskEPn_CNT;
   i = n;
 
 #if SN32_USB_USE_FAST_COPY
@@ -206,15 +206,15 @@ static void usb_packet_write_from_buffer(usbep_t ep,
   else {
     udp = USB_GET_DESCRIPTOR(ep);
   }
-  sn32_usb_pma_t *pmap = USB_ADDR2PTR(udp->TXADDR0);
+  sn32_usb_pma_t *pmap = USB_ADDR2PTR(udp->RWADDR);
   int i = (int)n;
 
-  udp->TXCOUNT0 = (sn32_usb_pma_t)n;
+  SN32_USB->EPCTL[ep] |= ((sn32_usb_pma_t)n | mskEPn_CNT);
 
 #if SN32_USB_USE_FAST_COPY
   while (i >= 16) {
     uint32_t w;
-
+    udp->RWSTATUS=0x02;
     w  = *(buf + 0);
     w |= *(buf + 1) << 8;
     *(pmap + 0) = (sn32_usb_pma_t)w;
@@ -248,7 +248,7 @@ static void usb_packet_write_from_buffer(usbep_t ep,
 
   while (i > 0) {
     uint32_t w;
-
+    udp->RWSTATUS=0x02;
     w  = *buf++;
     w |= *buf++ << 8;
     *pmap++ = (sn32_usb_pma_t)w;
@@ -566,9 +566,8 @@ void usb_lld_init_endpoint(USBDriver *usbp, usbep_t ep) {
 
   /* IN endpoint handling.*/
   if (epcp->in_state != NULL) {
-    dp->TXCOUNT0 = 0;
-    dp->TXADDR0  = usb_pm_alloc(usbp, epcp->in_maxsize);
-
+    dp->RWADDR  = usb_pm_alloc(usbp, epcp->in_maxsize);
+    dp->RWSTATUS=0x02;
   }
 
   /* OUT endpoint handling.*/
@@ -581,9 +580,10 @@ void usb_lld_init_endpoint(USBDriver *usbp, usbep_t ep) {
                 0x8000;
     else
       nblocks = ((((epcp->out_maxsize - 1) | 1) + 1) / 2) << 10;
-    dp->RXCOUNT0 = nblocks;
-    dp->RXADDR0  = usb_pm_alloc(usbp, epcp->out_maxsize);
 
+    SN32_USB->EPCTL[ep] |= (nblocks | mskEPn_CNT);
+    dp->RWADDR  = usb_pm_alloc(usbp, epcp->out_maxsize);
+    dp->RWSTATUS=0x02;
     cfg |= mskEPn_DIR(ep);
   }
 
@@ -692,7 +692,7 @@ void usb_lld_read_setup(USBDriver *usbp, usbep_t ep, uint8_t *buf) {
   else {
     udp = USB_GET_DESCRIPTOR(ep);
   }
-  pmap = USB_ADDR2PTR(udp->RXADDR0);
+  pmap = USB_ADDR2PTR(udp->RWADDR);
   for (n = 0; n < 4; n++) {
     *(uint16_t *)buf = (uint16_t)*pmap++;
     buf += 2;

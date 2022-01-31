@@ -81,21 +81,17 @@ typedef uint16_t sn32_usb_pma_t;
  */
 typedef struct {
   /**
-   * @brief   buffer offset register.
+   * @brief   RW buffer address register.
    */
-  volatile sn32_usb_pma_t      TXADDR0;
+  volatile sn32_usb_pma_t      RWADDR;
   /**
-   * @brief   counter register 0.
+   * @brief   RW buffer data register.
    */
-  volatile sn32_usb_pma_t      TXCOUNT0;
+  volatile sn32_usb_pma_t      RWDATA;
   /**
-   * @brief   RX buffer offset register.
+   * @brief   RW buffer status register.
    */
-  volatile sn32_usb_pma_t      RXADDR0;
-  /**
-   * @brief   RX counter register 0.
-   */
-  volatile sn32_usb_pma_t      RXCOUNT0;
+  volatile sn32_usb_pma_t      RWSTATUS;
 } sn32_usb_descriptor_t;
 
 /** @} */
@@ -119,8 +115,6 @@ typedef struct {
  * @brief   Pointer to the USB RAM.
  */
 #define SN32_USBRAM            ((sn32_usb_pma_t *)SN32_USBRAM_BASE)
-#define RXCOUNT_COUNT_MASK      0x03FF
-#define TXCOUNT_COUNT_MASK      0x03FF
 #define mskEPn_NAK(ep)          (0x1<<(ep -1))
 #define mskEPn_ACK(ep)          (0x1<<(8+(ep-1)))
 #define mskEPn_DIR(ep)          (0x1<<(ep-1))
