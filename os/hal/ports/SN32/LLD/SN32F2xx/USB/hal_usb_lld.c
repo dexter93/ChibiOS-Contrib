@@ -94,9 +94,7 @@ static const USBEndpointConfig ep0config = {
  */
 static void usb_pm_reset(USBDriver *usbp) {
 
-  /* The first 64 bytes are reserved for the descriptors table. The effective
-     available RAM for endpoint buffers is just 448 bytes.*/
-  usbp->pmnext = 64;
+  usbp->pmnext = 0;
 }
 
 /**
