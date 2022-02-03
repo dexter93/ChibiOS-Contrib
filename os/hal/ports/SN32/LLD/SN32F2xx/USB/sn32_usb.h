@@ -43,11 +43,6 @@
 #endif
 
 /**
- * @brief   Width of USB packet memory accesses.
- */
-typedef uint16_t sn32_usb_pma_t;
-
-/**
  * @brief   USB registers block.
  */
   typedef struct {
@@ -75,24 +70,6 @@ typedef uint16_t sn32_usb_pma_t;
   volatile uint32_t RWDATA2;                     /*!< (@ 0x00000088) Offset:0x88 USB Read/Write Data Register 2                 */
   volatile uint32_t RWSTATUS2;                   /*!< (@ 0x0000008C) Offset:0x8C USB Read/Write Status Register 2               */
 } sn32_usb_t;                                  /*!< Size = 144 (0x90)                                                         */
-
-/**
- * @brief   USB descriptor registers block.
- */
-typedef struct {
-  /**
-   * @brief   RW buffer address register.
-   */
-  volatile sn32_usb_pma_t      RWADDR;
-  /**
-   * @brief   RW buffer data register.
-   */
-  volatile sn32_usb_pma_t      RWDATA;
-  /**
-   * @brief   RW buffer status register.
-   */
-  volatile sn32_usb_pma_t      RWSTATUS;
-} sn32_usb_descriptor_t;
 
 /** @} */
 
@@ -126,25 +103,6 @@ typedef struct {
   SN32_USB->EPCTL[ep] = (mskEPn_ENDP_EN)
 #define EPCTL_TOGGLE(ep)                                                  \
   SN32_USB->EPTOGGLE = mskEPn_DATA_TOGGLE(ep)
-
-/**
- * @brief   Returns an endpoint descriptor pointer.
- */
-#define USB_GET_DESCRIPTOR(ep)                                            \
-  ((sn32_usb_descriptor_t *)((uint32_t)SN32_USBRAM_BASE +                 \
-                              (uint32_t)SN32_USB->EPBUFOS[ep-1] +         \
-                              sizeof(sn32_usb_descriptor_t)))
-#define USB_GET_CTRL_DESCRIPTOR()                                         \
-  ((sn32_usb_descriptor_t *)((uint32_t)SN32_USBRAM_BASE +                 \
-                              sizeof(sn32_usb_descriptor_t)))
-
-/**
- * @brief   Converts from a PMA address to a physical address.
- */
-#define USB_ADDR2PTR(addr)                                                \
-  ((sn32_usb_pma_t *)((addr) *                                            \
-                       (sizeof(sn32_usb_pma_t) / 2) +                     \
-                       SN32_USBRAM))
 
 #endif /* SN32_USB_H */
 

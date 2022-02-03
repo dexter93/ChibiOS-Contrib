@@ -86,6 +86,88 @@ static const USBEndpointConfig ep0config = {
 /*===========================================================================*/
 /* Driver local functions.                                                   */
 /*===========================================================================*/
+static void sn32_usb_read_fifo(usbep_t ep, uint8_t *buf, size_t sz, bool intr) {
+    size_t ep_offset;
+    size_t off;
+    size_t chunk;
+    uint32_t data;
+    if(ep == 0) {
+      ep_offset = 0;
+    }
+    else {
+      ep_offset = (uint32_t)SN32_USB->EPBUFOS[ep-1];
+    }
+
+    off = 0;
+    while (off != sz) {
+        chunk = 4;
+        if (off + chunk > sz)
+            chunk = sz - off;
+
+        if(intr)
+        {
+            SN32_USB->RWADDR = off + ep_offset;
+            SN32_USB->RWSTATUS = 0x02;
+            while (SN32_USB->RWSTATUS & 0x02);
+            data = SN32_USB->RWDATA;
+        }
+        else
+        {
+            SN32_USB->RWADDR2 = off + ep_offset;
+            SN32_USB->RWSTATUS2 = 0x02;
+            while (SN32_USB->RWSTATUS2 & 0x02);
+            data = SN32_USB->RWDATA2;
+        }
+
+        //dest, src, size
+        memcpy(buf, &data, chunk);
+
+        off += chunk;
+        buf += chunk;
+    }
+}
+
+static void sn32_usb_write_fifo(usbep_t ep, const uint8_t *buf, size_t sz, bool intr) {
+    size_t ep_offset;
+    size_t off;
+    size_t chunk;
+    uint32_t data;
+    if(ep == 0) {
+      ep_offset = 0;
+    }
+    else {
+      ep_offset = (uint32_t)SN32_USB->EPBUFOS[ep-1];
+    }
+
+    off = 0;
+
+    while (off != sz) {
+        chunk = 4;
+        if (off + chunk > sz)
+            chunk = sz - off;
+
+        //dest, src, size
+        memcpy(&data, buf, chunk);
+
+        if(intr)
+        {
+            SN32_USB->RWADDR = off + ep_offset;
+            SN32_USB->RWDATA = data;
+            SN32_USB->RWSTATUS = 0x01;
+            while (SN32_USB->RWSTATUS & 0x01);
+        }
+        else
+        {
+            SN32_USB->RWADDR2 = off + ep_offset;
+            SN32_USB->RWDATA2 = data;
+            SN32_USB->RWSTATUS2 = 0x01;
+            while (SN32_USB->RWSTATUS2 & 0x01);
+        }
+
+        off += chunk;
+        buf += chunk;
+    }
+}
 
 /**
  * @brief   Resets the packet memory allocator.
@@ -94,164 +176,27 @@ static const USBEndpointConfig ep0config = {
  */
 static void usb_pm_reset(USBDriver *usbp) {
 
-  usbp->pmnext = 0;
+  /* The first 64 bytes are reserved for the descriptors table. The effective
+     available RAM for endpoint buffers is just 448 bytes.*/
+  usbp->pmnext = 64;
 }
 
 /**
- * @brief   Resets the packet memory allocator.
+ * @brief   Sets the packet memory allocator.
  *
  * @param[in] usbp      pointer to the @p USBDriver object
  * @param[in] size      size of the packet buffer to allocate
  * @return              The packet buffer address.
  */
-static uint32_t usb_pm_alloc(USBDriver *usbp, size_t size) {
+static void usb_pm_alloc(USBDriver *usbp, size_t size, uint32_t ep) {
   uint32_t next;
 
   next = usbp->pmnext;
+  if ( ep != 0 ) {
+    SN32_USB->EPBUFOS[ep-1] = next;
+  }
   usbp->pmnext += (size + 1) & ~1;
   osalDbgAssert(usbp->pmnext <= SN32_USB_PMA_SIZE, "PMA overflow");
-  return next;
-}
-
-/**
- * @brief   Reads from a dedicated packet buffer.
- *
- * @param[in] ep        endpoint number
- * @param[out] buf      buffer where to copy the packet data
- * @return              The size of the receivee packet.
- *
- * @notapi
- */
-static size_t usb_packet_read_to_buffer(usbep_t ep, uint8_t *buf) {
-  size_t i, n;
-  sn32_usb_descriptor_t *udp;
-  if(ep == 0) {
-    udp = USB_GET_CTRL_DESCRIPTOR();
-  }
-  else {
-    udp = USB_GET_DESCRIPTOR(ep);
-  }
-  sn32_usb_pma_t *pmap = USB_ADDR2PTR(udp->RWADDR);
-  n = (size_t)SN32_USB->EPCTL[ep] & mskEPn_CNT;
-  i = n;
-
-#if SN32_USB_USE_FAST_COPY
-  while (i >= 16) {
-    uint32_t w;
-
-    w = *(pmap + 0);
-    *(buf + 0) = (uint8_t)w;
-    *(buf + 1) = (uint8_t)(w >> 8);
-    w = *(pmap + 1);
-    *(buf + 2) = (uint8_t)w;
-    *(buf + 3) = (uint8_t)(w >> 8);
-    w = *(pmap + 2);
-    *(buf + 4) = (uint8_t)w;
-    *(buf + 5) = (uint8_t)(w >> 8);
-    w = *(pmap + 3);
-    *(buf + 6) = (uint8_t)w;
-    *(buf + 7) = (uint8_t)(w >> 8);
-    w = *(pmap + 4);
-    *(buf + 8) = (uint8_t)w;
-    *(buf + 9) = (uint8_t)(w >> 8);
-    w = *(pmap + 5);
-    *(buf + 10) = (uint8_t)w;
-    *(buf + 11) = (uint8_t)(w >> 8);
-    w = *(pmap + 6);
-    *(buf + 12) = (uint8_t)w;
-    *(buf + 13) = (uint8_t)(w >> 8);
-    w = *(pmap + 7);
-    *(buf + 14) = (uint8_t)w;
-    *(buf + 15) = (uint8_t)(w >> 8);
-
-    i -= 16;
-    buf += 16;
-    pmap += 8;
-  }
-#endif /* SN32_USB_USE_FAST_COPY */
-
-  while (i >= 2) {
-    uint32_t w = *pmap++;
-    *buf++ = (uint8_t)w;
-    *buf++ = (uint8_t)(w >> 8);
-    i -= 2;
-  }
-
-  if (i >= 1) {
-    *buf = (uint8_t)*pmap;
-  }
-
-  return n;
-}
-
-/**
- * @brief   Writes to a dedicated packet buffer.
- *
- * @param[in] ep        endpoint number
- * @param[in] buf       buffer where to fetch the packet data
- * @param[in] n         maximum number of bytes to copy. This value must
- *                      not exceed the maximum packet size for this endpoint.
- *
- * @notapi
- */
-static void usb_packet_write_from_buffer(usbep_t ep,
-                                         const uint8_t *buf,
-                                         size_t n) {
-  sn32_usb_descriptor_t *udp;
-  if(ep == 0) {
-    udp = USB_GET_CTRL_DESCRIPTOR();
-  }
-  else {
-    udp = USB_GET_DESCRIPTOR(ep);
-  }
-  sn32_usb_pma_t *pmap = USB_ADDR2PTR(udp->RWADDR);
-  int i = (int)n;
-
-  SN32_USB->EPCTL[ep] |= ((sn32_usb_pma_t)n | mskEPn_CNT);
-
-#if SN32_USB_USE_FAST_COPY
-  while (i >= 16) {
-    uint32_t w;
-    udp->RWSTATUS=0x02;
-    w  = *(buf + 0);
-    w |= *(buf + 1) << 8;
-    *(pmap + 0) = (sn32_usb_pma_t)w;
-    w  = *(buf + 2);
-    w |= *(buf + 3) << 8;
-    *(pmap + 1) = (sn32_usb_pma_t)w;
-    w  = *(buf + 4);
-    w |= *(buf + 5) << 8;
-    *(pmap + 2) = (sn32_usb_pma_t)w;
-    w  = *(buf + 6);
-    w |= *(buf + 7) << 8;
-    *(pmap + 3) = (sn32_usb_pma_t)w;
-    w  = *(buf + 8);
-    w |= *(buf + 9) << 8;
-    *(pmap + 4) = (sn32_usb_pma_t)w;
-    w  = *(buf + 10);
-    w |= *(buf + 11) << 8;
-    *(pmap + 5) = (sn32_usb_pma_t)w;
-    w  = *(buf + 12);
-    w |= *(buf + 13) << 8;
-    *(pmap + 6) = (sn32_usb_pma_t)w;
-    w  = *(buf + 14);
-    w |= *(buf + 15) << 8;
-    *(pmap + 7) = (sn32_usb_pma_t)w;
-
-    i -= 16;
-    buf += 16;
-    pmap += 8;
-  }
-#endif /* SN32_USB_USE_FAST_COPY */
-
-  while (i > 0) {
-    uint32_t w;
-    udp->RWSTATUS=0x02;
-    w  = *buf++;
-    w |= *buf++ << 8;
-    *pmap++ = (sn32_usb_pma_t)w;
-    i -= 2;
-  }
 }
 
 /**
@@ -309,7 +254,7 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
         /* Writes the packet from the defined buffer.*/
         isp->txbuf += isp->txlast;
         isp->txlast = n;
-        usb_packet_write_from_buffer(ep, isp->txbuf, n);
+        sn32_usb_write_fifo(ep, isp->txbuf, n, true);
 
         /* Starting IN operation.*/
         EPCTL_SET_STAT_TX(ep, n);
@@ -338,7 +283,8 @@ static void usb_serve_endpoints(USBDriver *usbp, uint32_t ep) {
             USBOutEndpointState *osp = epcp->out_state;
 
             /* Reads the packet into the defined buffer.*/
-            n = usb_packet_read_to_buffer(ep, osp->rxbuf);
+            n = SN32_USB->EPCTL[ep] & mskEPn_CNT;
+            sn32_usb_read_fifo(ep, osp->rxbuf, n, true);
             osp->rxbuf += n;
 
             /* Transaction data updated.*/
@@ -557,20 +503,11 @@ void usb_lld_set_address(USBDriver *usbp) {
  */
 void usb_lld_init_endpoint(USBDriver *usbp, usbep_t ep) {
   uint32_t cfg = SN32_USB->CFG;
-  sn32_usb_descriptor_t *dp;
   const USBEndpointConfig *epcp = usbp->epc[ep];
-
-  if(ep == 0) {
-    dp = USB_GET_CTRL_DESCRIPTOR();
-  }
-  else {
-    dp = USB_GET_DESCRIPTOR(ep);
-  }
 
   /* IN endpoint handling.*/
   if (epcp->in_state != NULL) {
-    dp->RWADDR  = usb_pm_alloc(usbp, epcp->in_maxsize);
-    dp->RWSTATUS=0x02;
+    usb_pm_alloc(usbp, epcp->in_maxsize, ep);
   }
 
   /* OUT endpoint handling.*/
@@ -585,8 +522,7 @@ void usb_lld_init_endpoint(USBDriver *usbp, usbep_t ep) {
       nblocks = ((((epcp->out_maxsize - 1) | 1) + 1) / 2) << 10;
 
     SN32_USB->EPCTL[ep] |= (nblocks | mskEPn_CNT);
-    dp->RWADDR  = usb_pm_alloc(usbp, epcp->out_maxsize);
-    dp->RWSTATUS=0x02;
+    usb_pm_alloc(usbp, epcp->out_maxsize, ep);
     cfg |= mskEPn_DIR(ep);
   }
 
@@ -684,22 +620,8 @@ usbepstatus_t usb_lld_get_status_in(USBDriver *usbp, usbep_t ep) {
  * @notapi
  */
 void usb_lld_read_setup(USBDriver *usbp, usbep_t ep, uint8_t *buf) {
-  sn32_usb_pma_t *pmap;
-  sn32_usb_descriptor_t *udp;
-  uint32_t n;
 
-  (void)usbp;
-  if(ep == 0) {
-    udp = USB_GET_CTRL_DESCRIPTOR();
-  }
-  else {
-    udp = USB_GET_DESCRIPTOR(ep);
-  }
-  pmap = USB_ADDR2PTR(udp->RWADDR);
-  for (n = 0; n < 4; n++) {
-    *(uint16_t *)buf = (uint16_t)*pmap++;
-    buf += 2;
-  }
+  sn32_usb_read_fifo(ep, buf, 8, false);
 }
 
 /**
@@ -741,7 +663,7 @@ void usb_lld_start_in(USBDriver *usbp, usbep_t ep) {
     n = (size_t)usbp->epc[ep]->in_maxsize;
 
   isp->txlast = n;
-  usb_packet_write_from_buffer(ep, isp->txbuf, n);
+  sn32_usb_write_fifo(ep, isp->txbuf, n, false);
 
   EPCTL_SET_STAT_TX(ep, n);
 }
