@@ -372,6 +372,19 @@ struct USBDriver {
 #define usb_lld_get_transaction_size(usbp, ep)                              \
   ((usbp)->epc[ep]->out_state->rxcnt)
 
+/**
+ * @brief   Connects the USB device.
+ *
+ * @api
+ */
+#define usb_lld_connect_bus(usbp)
+
+/**
+ * @brief   Disconnect the USB device.
+ *
+ * @api
+ */
+#define usb_lld_disconnect_bus(usbp)
 
 /**
  * @brief   Start of host wake-up procedure.
@@ -380,11 +393,11 @@ struct USBDriver {
  */
 #define usb_lld_wakeup_host(usbp)                                           \
   do {                                                                      \
-    SN_USB->SGCTL = (mskBUS_DRVEN|mskBUS_J_STATE);                          \
+    SN32_USB->SGCTL = (mskBUS_DRVEN|mskBUS_J_STATE);                        \
     osalThreadSleepMilliseconds(180);                                       \
-    SN_USB->SGCTL = (mskBUS_DRVEN|mskBUS_K_STATE);                          \
+    SN32_USB->SGCTL = (mskBUS_DRVEN|mskBUS_K_STATE);                        \
     osalThreadSleepMilliseconds(10);                                        \
-    SN_USB->SGCTL &= ~mskBUS_DRVEN;                                         \
+    SN32_USB->SGCTL &= ~mskBUS_DRVEN;                                       \
   } while (false)
 
 /*===========================================================================*/
