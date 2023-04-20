@@ -80,32 +80,40 @@ static void irq_handler(ioportid_t port, palevent_t *events) {
 
 #if (PAL_USE_WAIT == TRUE) || (PAL_USE_CALLBACKS == TRUE)
 #if SN32_HAS_GPIOA
+#if SN32_USE_PAL_CALLBACKS_PORTA
 OSAL_IRQ_HANDLER(SN32_GPIOA_HANDLER) {
     OSAL_IRQ_PROLOGUE();
     irq_handler(GPIOA, _pal_events);
     OSAL_IRQ_EPILOGUE();
 }
 #endif
+#endif
 #if SN32_HAS_GPIOB
+#if SN32_USE_PAL_CALLBACKS_PORTB
 OSAL_IRQ_HANDLER(SN32_GPIOB_HANDLER) {
     OSAL_IRQ_PROLOGUE();
     irq_handler(GPIOB, _pal_events + PAL_IOPORTS_WIDTH);
     OSAL_IRQ_EPILOGUE();
 }
 #endif
+#endif
 #if SN32_HAS_GPIOC
+#if SN32_USE_PAL_CALLBACKS_PORTC
 OSAL_IRQ_HANDLER(SN32_GPIOC_HANDLER) {
     OSAL_IRQ_PROLOGUE();
     irq_handler(GPIOC, _pal_events + PAL_IOPORTS_WIDTH * 2);
     OSAL_IRQ_EPILOGUE();
 }
 #endif
+#endif
 #if SN32_HAS_GPIOD
+#if SN32_USE_PAL_CALLBACKS_PORTD
 OSAL_IRQ_HANDLER(SN32_GPIOD_HANDLER) {
     OSAL_IRQ_PROLOGUE();
     irq_handler(GPIOD, _pal_events + PAL_IOPORTS_WIDTH * 3);
     OSAL_IRQ_EPILOGUE();
 }
+#endif
 #endif
 #endif /* (PAL_USE_WAIT == TRUE) || (PAL_USE_CALLBACKS == TRUE) */
 
@@ -125,20 +133,28 @@ void _pal_lld_init(const PALConfig *config) {
 
 #if (PAL_USE_WAIT == TRUE) || (PAL_USE_CALLBACKS == TRUE)
 #if SN32_HAS_GPIOA
+#if SN32_USE_PAL_CALLBACKS_PORTA
   sys1EnableP0();
   nvicEnableVector(SN32_GPIOA_NUMBER, SN32_GPIOA_IRQ_PRIORITY);
 #endif
+#endif
 #if SN32_HAS_GPIOB
+#if SN32_USE_PAL_CALLBACKS_PORTB
   sys1EnableP1();
   nvicEnableVector(SN32_GPIOB_NUMBER, SN32_GPIOB_IRQ_PRIORITY);
 #endif
+#endif
 #if SN32_HAS_GPIOC
+#if SN32_USE_PAL_CALLBACKS_PORTC
   sys1EnableP2();
   nvicEnableVector(SN32_GPIOC_NUMBER, SN32_GPIOC_IRQ_PRIORITY);
 #endif
+#endif
 #if SN32_HAS_GPIOD
+#if SN32_USE_PAL_CALLBACKS_PORTD
   sys1EnableP3();
   nvicEnableVector(SN32_GPIOD_NUMBER, SN32_GPIOD_IRQ_PRIORITY);
+#endif
 #endif
 #endif
 
