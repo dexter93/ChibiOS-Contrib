@@ -35,18 +35,6 @@
 //    be updated to the new style.*/
 // // #define PAL_NEW_INIT
 
-#ifndef SN32_USE_PAL_CALLBACKS_PORTA
-#define SN32_USE_PAL_CALLBACKS_PORTA FALSE
-#endif
-#ifndef SN32_USE_PAL_CALLBACKS_PORTB
-#define SN32_USE_PAL_CALLBACKS_PORTB FALSE
-#endif
-#ifndef SN32_USE_PAL_CALLBACKS_PORTC
-#define SN32_USE_PAL_CALLBACKS_PORTC FALSE
-#endif
-#ifndef SN32_USE_PAL_CALLBACKS_PORTD
-#define SN32_USE_PAL_CALLBACKS_PORTD FALSE
-#endif
 
 /* Discarded definitions from the ST headers, the PAL driver uses its own
    definitions in order to have an unified handling for all devices.
@@ -72,16 +60,12 @@
 #define GPIOD                         ((SN_GPIO0_Type *)SN_GPIO3_BASE)// SN_GPIO3//
 
 /** @} */
-#if ((SN32_USE_PAL_CALLBACKS_PORTA != TRUE) || (SN32_USE_PAL_CALLBACKS_PORTB != TRUE) || (SN32_USE_PAL_CALLBACKS_PORTC != TRUE) || (SN32_USE_PAL_CALLBACKS_PORTD != TRUE))
-#define PORTS_COUNT(a,b,c,d) (SN32_USE_PAL_CALLBACKS_PORTA + SN32_USE_PAL_CALLBACKS_PORTB + SN32_USE_PAL_CALLBACKS_PORTC + SN32_USE_PAL_CALLBACKS_PORTD)
+
 /**
  * @name    Port related definitions
  * @{
  */
-#define TOTAL_PORTS PORTS_COUNT(SN32_USE_PAL_CALLBACKS_PORTA,SN32_USE_PAL_CALLBACKS_PORTB,SN32_USE_PAL_CALLBACKS_PORTC, SN32_USE_PAL_CALLBACKS_PORTD)
-#else
 #define TOTAL_PORTS       4U
-#endif
 /**
  * @brief   Width, in bits, of an I/O port.
  */
