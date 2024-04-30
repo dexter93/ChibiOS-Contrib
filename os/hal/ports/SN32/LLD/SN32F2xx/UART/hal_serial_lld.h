@@ -94,7 +94,7 @@
   */
 #define UART_Oversample_8                      (0x1<<8)
 #define UART_Oversample_16                     (0x0<<8)
-#define UART_FD_MULVAL(x)                      ((0x0000 + x) << 4)
+#define UART_FD_MULVAL(x)                      (((0x0000 + x) - 1) << 4)
 #define UART_FD_DIVADDVAL(x)                   (0x000 +x)
 /**
   * @}
