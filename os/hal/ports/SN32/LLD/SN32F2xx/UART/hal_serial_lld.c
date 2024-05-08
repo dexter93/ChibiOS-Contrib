@@ -234,8 +234,8 @@ static void set_error(SerialDriver *sdp, uint8_t ls) {
 
   if(ls & UART_LineStatus_BI)
     sts |= SD_BREAK_DETECTED;
-  if(ls & UART_LineStatus_OE)
-    sts |= SD_OVERRUN_ERROR;
+ // if(ls & UART_LineStatus_OE)
+   // sts |= SD_OVERRUN_ERROR;
   if (ls & UART_LineStatus_PE)
     sts |= SD_PARITY_ERROR;
   if (ls & UART_LineStatus_FE)
@@ -252,6 +252,8 @@ static void set_error(SerialDriver *sdp, uint8_t ls) {
  * @param[in] sdp       communication channel associated to the UART
  */
 static void serve_interrupt(SerialDriver *sdp) {
+  #define UART_LS_STATUS (UART_LineStatus_PE | UART_LineStatus_FE | UART_LineStatus_BI | UART_LineStatus_RxError)
+
   sn32_uart_t *u = sdp->uart;
   uint32_t ii=u->II;
 
@@ -259,21 +261,35 @@ static void serve_interrupt(SerialDriver *sdp) {
     uint32_t int_status = (ii >> UART_Interrupt_Status);
     switch (int_status & UART_InterruptID_Status) {
     case UART_Interrupt_Pending:
+      ii=u->II;
       return;
     case UART_InterruptID_RLS:
-      set_error(sdp, u->LS);
-      break;
+      if (u->LS & UART_LineStatus_BI) {
+        set_error(sdp,UART_LineStatus_BI);
+        u-> IE &= ~(UART_ReceiveLine);
+        (void)u->RB;
+        break;
+      }
     case UART_InterruptID_CTI:
     case UART_InterruptID_RDA:
+      //uint32_t ls = u->LS;
+      //if(ls & UART_LS_STATUS) {
+      //  set_error(sdp, ls);
+      // (void)u->RB;
+       //break;
+     // }
       osalSysLockFromISR();
       if (iqIsEmptyI(&sdp->iqueue))
         chnAddFlagsI(sdp, CHN_INPUT_AVAILABLE);
       osalSysUnlockFromISR();
-      while (u->LS & UART_LineStatus_RDR) {
+      uint32_t ls = u->LS;
+      while (ls & UART_LineStatus_RDR) {
+        if(ls & UART_LS_STATUS) set_error(sdp, ls);
         osalSysLockFromISR();
         if (iqPutI(&sdp->iqueue, u->RB) < MSG_OK)
           chnAddFlagsI(sdp, SD_OVERRUN_ERROR);
         osalSysUnlockFromISR();
+        ls = u->LS;
       }
       break;
     case UART_InterruptID_THRE:
@@ -283,7 +299,7 @@ static void serve_interrupt(SerialDriver *sdp) {
       b = oqGetI(&sdp->oqueue);
       osalSysUnlockFromISR();
       if (b < MSG_OK) {
-        u->IE &= ~UART_TransmitterHoldingEmpty;
+        u->IE &= ~(UART_TransmitterHoldingEmpty);
         osalSysLockFromISR();
         chnAddFlagsI(sdp, CHN_OUTPUT_EMPTY);
         osalSysUnlockFromISR();
@@ -310,13 +326,14 @@ static void load(SerialDriver *sdp) {
   if (u->LS & UART_LineStatus_THRE) {
     osalSysLock();
     msg_t b = oqGetI(&sdp->oqueue);
+    osalSysUnlock();
     if (b < MSG_OK) {
+      osalSysLock();
       chnAddFlagsI(sdp, CHN_OUTPUT_EMPTY);
       osalSysUnlock();
       return;
     }
     u->TH = b;
-    osalSysUnlock();
   }
   u->IE |= (UART_TransmitterHoldingEmpty | UART_TransmitterEmpty);
 }
