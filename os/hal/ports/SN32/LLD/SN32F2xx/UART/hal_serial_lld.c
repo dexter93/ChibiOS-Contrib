@@ -66,10 +66,10 @@ static const SerialConfig default_config = {SERIAL_DEFAULT_BITRATE,
 /*===========================================================================*/
 /* Driver local functions.                                                   */
 /*===========================================================================*/
-void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,uint8_t *DLM,uint8_t *DLL,uint8_t  *D_DIVADDVAL,uint8_t  *D_MULVAL)
+/*void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,uint8_t *dlm,uint8_t *dll,uint8_t  *d_divaddval,uint8_t  *d_mulval)
 {
   float expected_val;
-  uint8_t DIVADDVAL[2],MULVAL[2];
+  uint8_t divaddval[2],mulval[2];
   uint8_t divider_Index = 0;
   uint8_t f_divider_new=0;
   uint16_t  divisor=0;
@@ -78,17 +78,17 @@ void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,
   
   //Init
   for(i=0;i<2;i++)  {
-    MULVAL[i] = 0;
-    DIVADDVAL[i] = 0;
+    mulval[i] = 0;
+    divaddval[i] = 0;
   }
   
-  expected_val = (float)UART_PCLK/Oversampling/baudrate;
+  expected_val = (float)((UART_PCLK/Oversampling)/baudrate);
   
   if((int)expected_val == expected_val) {
     divisor = expected_val;
     // no fractional divider needed
-    DIVADDVAL[0] = 0;
-    MULVAL[0] = 1;
+    divaddval[0] = 0;
+    mulval[0] = 1;
   } else {
     // we have to use the fractional divider
     // generate a lookup table
@@ -110,14 +110,14 @@ void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,
           for(k=0;k<divaddval_limit;k++) {
             if(j>k) {
               if(tab_D_div_M[j][k]>divider_minus && tab_D_div_M[j][k]<divider_plus) {
-                if(MULVAL[divider_Index] == 0 && DIVADDVAL[divider_Index] == 0) {
-                  MULVAL[divider_Index] = j;
-                  DIVADDVAL[divider_Index] = k;
+                if(mulval[divider_Index] == 0 && divaddval[divider_Index] == 0) {
+                  mulval[divider_Index] = j;
+                  divaddval[divider_Index] = k;
                   f_divider_new = 1;
                 } else {
-                  if((fabs)(tab_D_div_M[j][k]-divider_expected) < (fabs)(tab_D_div_M[MULVAL[divider_Index]][DIVADDVAL[divider_Index]]-divider_expected)) {
-                    MULVAL[divider_Index] = j;
-                    DIVADDVAL[divider_Index] = k;     
+                  if((fabs)(tab_D_div_M[j][k]-divider_expected) < (fabs)(tab_D_div_M[mulval[divider_Index]][divaddval[divider_Index]]-divider_expected)) {
+                    mulval[divider_Index] = j;
+                    divaddval[divider_Index] = k;     
                     f_divider_new = 1;
                   }
                 }
@@ -127,8 +127,8 @@ void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,
         }
       }
       else {
-        MULVAL[divider_Index] = 1;
-        DIVADDVAL[divider_Index] = 0;
+        mulval[divider_Index] = 1;
+        divaddval[divider_Index] = 0;
         f_divider_new = 1;        
       }
       if(f_divider_new == 1 ) {
@@ -136,9 +136,9 @@ void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,
           divider_Index++;
           divisor = i;
         } else {
-          if((fabs)((tab_D_div_M[MULVAL[1]][DIVADDVAL[1]]+1)*i-expected_val) < (fabs)((tab_D_div_M[MULVAL[0]][DIVADDVAL[0]]+1)*divisor-expected_val)) {
-            MULVAL[0] = MULVAL[1];
-            DIVADDVAL[0] = DIVADDVAL[1];
+          if((fabs)((tab_D_div_M[mulval[1]][divaddval[1]]+1)*i-expected_val) < (fabs)((tab_D_div_M[mulval[0]][divaddval[0]]+1)*divisor-expected_val)) {
+            mulval[0] = mulval[1];
+            divaddval[0] = divaddval[1];
             divisor = i;
           }
         }
@@ -148,12 +148,12 @@ void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,
   }
   // check the divisor is valid
   if(divisor != 0){
-    *DLM = (divisor>>8)&0xff;
-    *DLL = divisor&0xff;
-    *D_MULVAL = MULVAL[0];
-    *D_DIVADDVAL = DIVADDVAL[0];
+    *dlm = (divisor>>8)&0xff;
+    *dll = divisor&0xff;
+    *d_mulval = mulval[0];
+    *d_divaddval = divaddval[0];
   }
-}
+}*/
 /**
  * @brief   UART initialization.
  * @details This function must be invoked with interrupts disabled.
@@ -162,21 +162,23 @@ void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,
  * @param[in] config    the architecture-dependent serial driver configuration
  */
 static void uart_init(SerialDriver *sdp, const SerialConfig *config) {
-  uint32_t apbclock;
+ // uint32_t apbclock;
   uint8_t dlm, dll, divaddval, mulval, oversampling;
   sn32_uart_t *u = sdp->uart;
-
-  apbclock = SN32_HCLK;
 
 #if defined(UART_OVER8)
   oversampling = 8;
 #else
   oversampling = 16;
 #endif
+  //apbclock = (SN32_HCLK);//  * oversampling);
   
   // Calculate divider
-  UART_divisor_CAL(config->speed,apbclock,oversampling,&dlm,&dll,&divaddval,&mulval);
-
+  //UART_divisor_CAL(config->speed,apbclock,oversampling,&dlm,&dll,&divaddval,&mulval);
+  dlm=2;
+  dll=113;
+  divaddval=0;
+  mulval=1;
   // Update the registers
   u->LC = (config->UART_WordLength
           | config->UART_StopBits
@@ -184,15 +186,16 @@ static void uart_init(SerialDriver *sdp, const SerialConfig *config) {
           | UART_Break_Control_Disable
           | UART_Divisor_Latch_Access_Enable);
 
-  u->FD_b.MULVAL = mulval;
-  u->FD_b.DIVADDVAL = divaddval;
-  u->FD_b.OVER8 = (oversampling == 8) ? 1 : 0;
-  u->DLM_b.DLM = dlm;
-  u->DLL_b.DLL = dll;
-
+  //u->FD_b.MULVAL = mulval;
+ // u->FD_b.DIVADDVAL = divaddval;
+  u->FD = (UART_FD_MULVAL(mulval) | UART_FD_DIVADDVAL(divaddval) | (oversampling == 8 ? UART_Oversample_8 : UART_Oversample_16));
+  //u->FD_b.OVER8 = (oversampling == 8) ? 1 : 0;
+  u->DLM = dlm;
+  u->DLL = dll;
+  u->ABCTRL = UART_AutoBaudControl_None;
   u->LC &= ~(UART_Divisor_Latch_Access_Enable);
   // Disable AutoBaud for serial - not useful
-  u->ABCTRL = UART_AutoBaudControl_None;
+  //u->ABCTRL = UART_AutoBaudControl_None;
 
   // Reset FIFO and enable
   // Set RX trigger level
@@ -253,7 +256,7 @@ static void set_error(SerialDriver *sdp, uint8_t ls) {
  */
 static void serve_interrupt(SerialDriver *sdp) {
   #define UART_LS_STATUS (UART_LineStatus_PE | UART_LineStatus_FE | UART_LineStatus_BI | UART_LineStatus_RxError)
-
+  gpio_write_pin_high(C5);
   sn32_uart_t *u = sdp->uart;
   uint32_t ii=u->II;
 
@@ -283,7 +286,7 @@ static void serve_interrupt(SerialDriver *sdp) {
         chnAddFlagsI(sdp, CHN_INPUT_AVAILABLE);
       osalSysUnlockFromISR();
       uint32_t ls = u->LS;
-      while (ls & UART_LineStatus_RDR) {
+      if (ls & UART_LineStatus_RDR) {
         if(ls & UART_LS_STATUS) set_error(sdp, ls);
         osalSysLockFromISR();
         if (iqPutI(&sdp->iqueue, u->RB) < MSG_OK)
@@ -293,6 +296,8 @@ static void serve_interrupt(SerialDriver *sdp) {
       }
       break;
     case UART_InterruptID_THRE:
+      if (u->LS & UART_LineStatus_THRE) {
+
       msg_t b;
 
       osalSysLockFromISR();
@@ -306,6 +311,8 @@ static void serve_interrupt(SerialDriver *sdp) {
         break;
       }
       u->TH = b;
+    }
+      //while ((u->LS & UART_LineStatus_THRE) == 0);
       break;
     case UART_InterruptID_TEMT:
       osalSysLockFromISR();
@@ -319,10 +326,12 @@ static void serve_interrupt(SerialDriver *sdp) {
     }
     ii=u->II;
   }
+  gpio_write_pin_low(C5);
 }
 
 static void load(SerialDriver *sdp) {
   sn32_uart_t *u = sdp->uart;
+  gpio_write_pin_high(C4);
   if (u->LS & UART_LineStatus_THRE) {
     osalSysLock();
     msg_t b = oqGetI(&sdp->oqueue);
@@ -334,8 +343,10 @@ static void load(SerialDriver *sdp) {
       return;
     }
     u->TH = b;
+    while ((u->LS & UART_LineStatus_THRE) == 0);
   }
-  u->IE |= (UART_TransmitterHoldingEmpty | UART_TransmitterEmpty);
+  u->IE |= (UART_TransmitterHoldingEmpty );//| UART_TransmitterEmpty);
+  gpio_write_pin_low(C4);
 }
 #if SN32_SERIAL_USE_UART0 || defined(__DOXYGEN__)
 static void notify0(io_queue_t *qp) {
@@ -431,6 +442,34 @@ OSAL_IRQ_HANDLER(SN32_UART2_HANDLER) {
  * @notapi
  */
 void sd_lld_init(void) {
+  gpio_set_pin_output(C0);
+  gpio_set_pin_output(C1);
+  gpio_set_pin_output(C2);
+  gpio_set_pin_output(C3);
+  gpio_set_pin_output(C4);
+  gpio_set_pin_output(C5);
+  gpio_set_pin_output(C6);
+  gpio_set_pin_output(C7);
+  gpio_set_pin_output(C8);
+  gpio_set_pin_output(C9);
+  gpio_set_pin_output(C10);
+  gpio_set_pin_output(C11);
+  gpio_set_pin_output(C12);
+  gpio_set_pin_output(C13);
+  gpio_write_pin_low(C0);
+  gpio_write_pin_low(C1);
+  gpio_write_pin_low(C2);
+  gpio_write_pin_low(C3);
+  gpio_write_pin_low(C4);
+  gpio_write_pin_low(C5);
+  gpio_write_pin_low(C6);
+  gpio_write_pin_low(C7);
+  gpio_write_pin_low(C8);
+  gpio_write_pin_low(C9);
+  gpio_write_pin_low(C10);
+  gpio_write_pin_low(C11);
+  gpio_write_pin_low(C12);
+  gpio_write_pin_low(C13);
 
 #if SN32_SERIAL_USE_UART0
   sdObjectInit(&SD0, NULL, notify0);
