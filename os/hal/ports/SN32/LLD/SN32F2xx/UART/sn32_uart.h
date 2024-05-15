@@ -15,188 +15,167 @@
 */
 
 #ifndef SN32_UART_H
-#define SN32_UART_H
+#    define SN32_UART_H
 
 typedef struct {
-  union {
     union {
-      uint32_t RB;
-      struct {
-        uint32_t RB       : 8;
-        uint32_t          : 24;
-      } RB_b;
-    } ;
+        union {
+            __IM uint32_t RB;
 
-    union {
-      uint32_t TH;      
-      struct {
-        uint32_t TH       : 8;
-        uint32_t          : 24;
-      } TH_b;
-    } ;
+            struct {
+                __IM uint32_t RB : 8;
+            } RB_b;
+        };
 
-    union {
-      uint32_t DLL;
-      struct {
-        uint32_t DLL      : 8;
-        uint32_t          : 24;
-      } DLL_b;
-    } ;
-  };
+        union {
+            __OM uint32_t TH;
 
-  union {
-    union {
-      uint32_t DLM;
-      struct {
-        uint32_t DLM      : 8;
-        uint32_t          : 24;
-      } DLM_b;
-    } ;
+            struct {
+                __OM uint32_t TH : 8;
+            } TH_b;
+        };
+
+        union {
+            __IOM uint32_t DLL;
+
+            struct {
+                __IOM uint32_t DLL : 8;
+            } DLL_b;
+        };
+    };
 
     union {
-      uint32_t IE;
-      struct {
-        uint32_t RDAIE    : 1;
-        uint32_t THREIE   : 1;
-        uint32_t RLSIE    : 1;
-        uint32_t          : 1;
-        uint32_t TEMTIE   : 1;
-        uint32_t          : 3;
-        uint32_t ABEOIE   : 1;
-        uint32_t ABTOIE   : 1;
-        uint32_t          : 22;
-      } IE_b;
-    } ;
-  };
+        union {
+            __IOM uint32_t DLM;
 
-  union {
+            struct {
+                __IOM uint32_t DLM : 8;
+            } DLM_b;
+        };
+
+        union {
+            __IOM uint32_t IE;
+
+            struct {
+                __IOM uint32_t RDAIE : 1;
+                __IOM uint32_t THREIE : 1;
+                __IOM uint32_t RLSIE : 1;
+                __IM           uint32_t : 1;
+                __IOM uint32_t TEMTIE : 1;
+                __IM           uint32_t : 3;
+                __IOM uint32_t ABEOIE : 1;
+                __IOM uint32_t ABTOIE : 1;
+            } IE_b;
+        };
+    };
+
     union {
-      uint32_t II;
-      struct {
-        uint32_t INTSTATUS : 1;
-        uint32_t INTID    : 3;
-        uint32_t          : 2;
-        uint32_t FIFOEN   : 2;
-        uint32_t ABEOIF   : 1;
-        uint32_t ABTOIF   : 1;
-        uint32_t          : 22;
-      } II_b;
-    } ;
-    
+        union {
+            __IM uint32_t II;
+
+            struct {
+                __IM uint32_t INTSTATUS : 1;
+                __IM uint32_t INTID : 3;
+                __IM          uint32_t : 2;
+                __IM uint32_t FIFOEN : 2;
+                __IM uint32_t ABEOIF : 1;
+                __IM uint32_t ABTOIF : 1;
+            } II_b;
+        };
+
+        union {
+            __OM uint32_t FIFOCTRL;
+
+            struct {
+                __OM uint32_t FIFOEN : 1;
+                __IM          uint32_t : 5;
+                __OM uint32_t RXTL : 2;
+            } FIFOCTRL_b;
+        };
+    };
+
     union {
-      uint32_t FIFOCTRL;
-      struct {
-        uint32_t FIFOEN   : 1;
-        uint32_t          : 5;
-        uint32_t RXTL     : 2;
-        uint32_t          : 24;
-      } FIFOCTRL_b;
-    } ;
-  };
+        __IOM uint32_t LC;
 
-  union {
-    uint32_t LC;
-    struct {
-      uint32_t WLS        : 2;
-      uint32_t SBS        : 1;
-      uint32_t PE         : 1;
-      uint32_t PS         : 2;
-      uint32_t BC         : 1;
-      uint32_t DLAB       : 1;
-      uint32_t            : 24;
-    } LC_b;
-  } ;
+        struct {
+            __IOM uint32_t WLS : 2;
+            __IOM uint32_t SBS : 1;
+            __IOM uint32_t PE : 1;
+            __IOM uint32_t PS : 2;
+            __IOM uint32_t BC : 1;
+            __IOM uint32_t DLAB : 1;
+        } LC_b;
+    };
+    __IM uint32_t RESERVED;
 
-  union {
-    __IOM uint32_t MC;
-    
-    struct {
-      uint32_t            : 1;
-      uint32_t RTSCTRL    : 1;
-      uint32_t            : 4;
-      uint32_t RTSEN      : 1;
-      uint32_t CTSEN      : 1;
-      uint32_t            : 24;
-    } MC_b;
-  } ;
+    union {
+        __IM uint32_t LS;
 
-  union {
-    uint32_t LS;
-    struct {
-      uint32_t RDR        : 1;
-      uint32_t OE         : 1;
-      uint32_t PE         : 1;
-      uint32_t FE         : 1;
-      uint32_t BI         : 1;
-      uint32_t THRE       : 1;
-      uint32_t TEMT       : 1;
-      uint32_t RXFE       : 1;
-      uint32_t            : 24;
-    } LS_b;
-  } ;
+        struct {
+            __IM uint32_t RDR : 1;
+            __IM uint32_t OE : 1;
+            __IM uint32_t PE : 1;
+            __IM uint32_t FE : 1;
+            __IM uint32_t BI : 1;
+            __IM uint32_t THRE : 1;
+            __IM uint32_t TEMT : 1;
+            __IM uint32_t RXFE : 1;
+        } LS_b;
+    };
+    __IM uint32_t RESERVED1;
 
-  union {
-    __IM  uint32_t MS;
-    struct {
-      uint32_t DCTS       : 1;
-      uint32_t            : 3;
-      uint32_t CTS        : 1;
-      uint32_t            : 27;
-    } MS_b;
-  } ;
+    union {
+        __IOM uint32_t SP;
 
-  union {
-    uint32_t SP;
-    struct {
-      uint32_t PAD        : 8;
-      uint32_t            : 24;
-    } SP_b;
-  } ;
+        struct {
+            __IOM uint32_t PAD : 8;
+        } SP_b;
+    };
 
-  union {
-    uint32_t ABCTRL;
-    struct {
-      uint32_t START      : 1;
-      uint32_t MODE       : 1;
-      uint32_t AUTORESTART : 1;
-      uint32_t            : 5;
-      uint32_t ABEOIFC    : 1;
-      uint32_t ABTOIFC    : 1;
-      uint32_t            : 22;
-    } ABCTRL_b;
-  } ;
-  uint32_t  RESERVED;
+    union {
+        __IOM uint32_t ABCTRL;
 
-  union {
-    uint32_t FD;
-    struct {
-      uint32_t DIVADDVAL  : 4;
-      uint32_t MULVAL     : 4;
-      uint32_t OVER8      : 1;
-      uint32_t            : 23;
-    } FD_b;
-  } ;
-  uint32_t  RESERVED1;
+        struct {
+            __IOM uint32_t START : 1;
+            __IOM uint32_t MODE : 1;
+            __IOM uint32_t AUTORESTART : 1;
+            __IM           uint32_t : 5;
+            __OM uint32_t  ABEOIFC : 1;
+            __OM uint32_t  ABTOIFC : 1;
+        } ABCTRL_b;
+    };
+    __IM uint32_t RESERVED2;
 
-  union {
-    uint32_t CTRL;
-    struct {
-      uint32_t UARTEN     : 1;
-      uint32_t MODE       : 3;
-      uint32_t            : 2;
-      uint32_t RXEN       : 1;
-      uint32_t TXEN       : 1;
-      uint32_t            : 24;
-    } CTRL_b;
-  } ;
+    union {
+        __IOM uint32_t FD;
 
-  union {
-    uint32_t HDEN;
-    struct {
-      uint32_t HDEN       : 1;
-      uint32_t            : 31;
-    } HDEN_b;
-  } ;
+        struct {
+            __IOM uint32_t DIVADDVAL : 4;
+            __IOM uint32_t MULVAL : 4;
+            __IOM uint32_t OVER8 : 1;
+        } FD_b;
+    };
+    __IM uint32_t RESERVED3;
+
+    union {
+        __IOM uint32_t CTRL;
+
+        struct {
+            __IOM uint32_t UARTEN : 1;
+            __IOM uint32_t MODE : 3;
+            __IM           uint32_t : 2;
+            __IOM uint32_t RXEN : 1;
+            __IOM uint32_t TXEN : 1;
+        } CTRL_b;
+    };
+
+    union {
+        __IOM uint32_t HDEN;
+
+        struct {
+            __IOM uint32_t HDEN : 1;
+        } HDEN_b;
+    };
 } sn32_uart_t;
 
 #endif /* SN32_UART_H */

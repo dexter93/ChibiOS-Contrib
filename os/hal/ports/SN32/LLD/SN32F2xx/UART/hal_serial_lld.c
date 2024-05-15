@@ -66,7 +66,7 @@ static const SerialConfig default_config = {SERIAL_DEFAULT_BITRATE,
 /*===========================================================================*/
 /* Driver local functions.                                                   */
 /*===========================================================================*/
-/*void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,uint8_t *dlm,uint8_t *dll,uint8_t  *d_divaddval,uint8_t  *d_mulval)
+void UART_divisor_CAL(uint32_t baudrate,uint32_t UART_PCLK,uint8_t Oversampling,uint8_t *dlm,uint8_t *dll,uint8_t  *d_divaddval,uint8_t  *d_mulval)
 {
   float expected_val;
   uint8_t divaddval[2],mulval[2];
@@ -82,7 +82,7 @@ static const SerialConfig default_config = {SERIAL_DEFAULT_BITRATE,
     divaddval[i] = 0;
   }
   
-  expected_val = (float)((UART_PCLK/Oversampling)/baudrate);
+  expected_val = (float)(UART_PCLK/Oversampling/baudrate);
   
   if((int)expected_val == expected_val) {
     divisor = expected_val;
@@ -153,7 +153,7 @@ static const SerialConfig default_config = {SERIAL_DEFAULT_BITRATE,
     *d_mulval = mulval[0];
     *d_divaddval = divaddval[0];
   }
-}*/
+}
 /**
  * @brief   UART initialization.
  * @details This function must be invoked with interrupts disabled.
@@ -162,7 +162,7 @@ static const SerialConfig default_config = {SERIAL_DEFAULT_BITRATE,
  * @param[in] config    the architecture-dependent serial driver configuration
  */
 static void uart_init(SerialDriver *sdp, const SerialConfig *config) {
- // uint32_t apbclock;
+  uint32_t apbclock;
   uint8_t dlm, dll, divaddval, mulval, oversampling;
   sn32_uart_t *u = sdp->uart;
 
@@ -171,31 +171,28 @@ static void uart_init(SerialDriver *sdp, const SerialConfig *config) {
 #else
   oversampling = 16;
 #endif
-  //apbclock = (SN32_HCLK);//  * oversampling);
-  
+
+  apbclock = (SN32_HCLK);
+
   // Calculate divider
-  //UART_divisor_CAL(config->speed,apbclock,oversampling,&dlm,&dll,&divaddval,&mulval);
-  dlm=2;
-  dll=113;
-  divaddval=0;
-  mulval=1;
+  UART_divisor_CAL(config->speed,apbclock,oversampling,&dlm,&dll,&divaddval,&mulval);
+
   // Update the registers
-  u->LC = (config->UART_WordLength
+  u->LC = UART_Divisor_Latch_Access_Enable;
+  u->LC |= (config->UART_WordLength
           | config->UART_StopBits
           | config->UART_Parity
-          | UART_Break_Control_Disable
-          | UART_Divisor_Latch_Access_Enable);
+          | UART_Break_Control_Disable);
 
-  //u->FD_b.MULVAL = mulval;
- // u->FD_b.DIVADDVAL = divaddval;
-  u->FD = (UART_FD_MULVAL(mulval) | UART_FD_DIVADDVAL(divaddval) | (oversampling == 8 ? UART_Oversample_8 : UART_Oversample_16));
-  //u->FD_b.OVER8 = (oversampling == 8) ? 1 : 0;
+  u->FD_b.MULVAL = mulval;
+  u->FD_b.DIVADDVAL = divaddval;
+  u->FD_b.OVER8 = (oversampling == 8) ? 1 : 0;
   u->DLM = dlm;
   u->DLL = dll;
-  u->ABCTRL = UART_AutoBaudControl_None;
+
   u->LC &= ~(UART_Divisor_Latch_Access_Enable);
   // Disable AutoBaud for serial - not useful
-  //u->ABCTRL = UART_AutoBaudControl_None;
+  u->ABCTRL = UART_AutoBaudControl_None;
 
   // Reset FIFO and enable
   // Set RX trigger level
@@ -237,8 +234,6 @@ static void set_error(SerialDriver *sdp, uint8_t ls) {
 
   if(ls & UART_LineStatus_BI)
     sts |= SD_BREAK_DETECTED;
- // if(ls & UART_LineStatus_OE)
-   // sts |= SD_OVERRUN_ERROR;
   if (ls & UART_LineStatus_PE)
     sts |= SD_PARITY_ERROR;
   if (ls & UART_LineStatus_FE)
@@ -256,7 +251,6 @@ static void set_error(SerialDriver *sdp, uint8_t ls) {
  */
 static void serve_interrupt(SerialDriver *sdp) {
   #define UART_LS_STATUS (UART_LineStatus_PE | UART_LineStatus_FE | UART_LineStatus_BI | UART_LineStatus_RxError)
-  gpio_write_pin_high(C5);
   sn32_uart_t *u = sdp->uart;
   uint32_t ii=u->II;
 
@@ -275,12 +269,6 @@ static void serve_interrupt(SerialDriver *sdp) {
       }
     case UART_InterruptID_CTI:
     case UART_InterruptID_RDA:
-      //uint32_t ls = u->LS;
-      //if(ls & UART_LS_STATUS) {
-      //  set_error(sdp, ls);
-      // (void)u->RB;
-       //break;
-     // }
       osalSysLockFromISR();
       if (iqIsEmptyI(&sdp->iqueue))
         chnAddFlagsI(sdp, CHN_INPUT_AVAILABLE);
@@ -296,8 +284,6 @@ static void serve_interrupt(SerialDriver *sdp) {
       }
       break;
     case UART_InterruptID_THRE:
-      if (u->LS & UART_LineStatus_THRE) {
-
       msg_t b;
 
       osalSysLockFromISR();
@@ -311,8 +297,6 @@ static void serve_interrupt(SerialDriver *sdp) {
         break;
       }
       u->TH = b;
-    }
-      //while ((u->LS & UART_LineStatus_THRE) == 0);
       break;
     case UART_InterruptID_TEMT:
       osalSysLockFromISR();
@@ -326,12 +310,10 @@ static void serve_interrupt(SerialDriver *sdp) {
     }
     ii=u->II;
   }
-  gpio_write_pin_low(C5);
 }
 
 static void load(SerialDriver *sdp) {
   sn32_uart_t *u = sdp->uart;
-  gpio_write_pin_high(C4);
   if (u->LS & UART_LineStatus_THRE) {
     osalSysLock();
     msg_t b = oqGetI(&sdp->oqueue);
@@ -343,10 +325,8 @@ static void load(SerialDriver *sdp) {
       return;
     }
     u->TH = b;
-    while ((u->LS & UART_LineStatus_THRE) == 0);
   }
-  u->IE |= (UART_TransmitterHoldingEmpty );//| UART_TransmitterEmpty);
-  gpio_write_pin_low(C4);
+  u->IE |= (UART_TransmitterHoldingEmpty | UART_TransmitterEmpty);
 }
 #if SN32_SERIAL_USE_UART0 || defined(__DOXYGEN__)
 static void notify0(io_queue_t *qp) {
@@ -442,34 +422,6 @@ OSAL_IRQ_HANDLER(SN32_UART2_HANDLER) {
  * @notapi
  */
 void sd_lld_init(void) {
-  gpio_set_pin_output(C0);
-  gpio_set_pin_output(C1);
-  gpio_set_pin_output(C2);
-  gpio_set_pin_output(C3);
-  gpio_set_pin_output(C4);
-  gpio_set_pin_output(C5);
-  gpio_set_pin_output(C6);
-  gpio_set_pin_output(C7);
-  gpio_set_pin_output(C8);
-  gpio_set_pin_output(C9);
-  gpio_set_pin_output(C10);
-  gpio_set_pin_output(C11);
-  gpio_set_pin_output(C12);
-  gpio_set_pin_output(C13);
-  gpio_write_pin_low(C0);
-  gpio_write_pin_low(C1);
-  gpio_write_pin_low(C2);
-  gpio_write_pin_low(C3);
-  gpio_write_pin_low(C4);
-  gpio_write_pin_low(C5);
-  gpio_write_pin_low(C6);
-  gpio_write_pin_low(C7);
-  gpio_write_pin_low(C8);
-  gpio_write_pin_low(C9);
-  gpio_write_pin_low(C10);
-  gpio_write_pin_low(C11);
-  gpio_write_pin_low(C12);
-  gpio_write_pin_low(C13);
 
 #if SN32_SERIAL_USE_UART0
   sdObjectInit(&SD0, NULL, notify0);
