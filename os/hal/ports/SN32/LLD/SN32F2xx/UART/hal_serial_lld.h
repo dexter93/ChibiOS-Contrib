@@ -162,6 +162,11 @@
   * @}
   */
 
+/** @defgroup UART_HalfDuplexMode
+  * @{
+  */
+#define UART_HalfDuplexEnable                  (0x01)
+#define UART_FullDuplexEnable                  0
 /**
  * @}
  */
@@ -313,6 +318,15 @@ typedef struct {
   * @brief Specifies the auto flow control mode and configures functionality.
   */
   uint32_t                  UART_AutoBaudControl;
+  /**
+  * @brief Specifies the oversampling rate.
+  *        This parameter can be a value of @ref UART_Oversample
+  */
+  uint16_t                   UART_Oversampling;
+  /**
+  * @brief Enables half-duplex mode.
+  */
+  uint8_t                   UART_HalfDuplexMode;
 } SerialConfig;
 
 /**

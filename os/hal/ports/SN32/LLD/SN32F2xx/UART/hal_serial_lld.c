@@ -61,7 +61,9 @@ static const SerialConfig default_config = {SERIAL_DEFAULT_BITRATE,
                                             UART_StopBits_One,
                                             UART_Parity_None,
                                             (UART_FIFO_Enable | UART_RxFIFOThreshold_1),
-                                            UART_AutoBaudControl_None};
+                                            UART_AutoBaudControl_None,
+                                            UART_Oversample_16,
+                                            UART_FullDuplexEnable};
 
 /*===========================================================================*/
 /* Driver local functions.                                                   */
@@ -166,12 +168,8 @@ static void uart_init(SerialDriver *sdp, const SerialConfig *config) {
   uint8_t dlm, dll, divaddval, mulval, oversampling;
   sn32_uart_t *u = sdp->uart;
 
-#if defined(UART_OVER8)
-  oversampling = 8;
-#else
-  oversampling = 16;
-#endif
-
+  // Default to oversampling by 16
+  oversampling = (config->UART_Oversampling == UART_Oversample_8) ? 8 : 16;
   apbclock = (SN32_HCLK);
 
   // Calculate divider
@@ -193,6 +191,9 @@ static void uart_init(SerialDriver *sdp, const SerialConfig *config) {
   u->LC &= ~(UART_Divisor_Latch_Access_Enable);
   // Disable AutoBaud for serial - not useful
   u->ABCTRL = UART_AutoBaudControl_None;
+
+  // Configure full or half duplex mode
+  u->HDEN = config->UART_HalfDuplexMode;
 
   // Reset FIFO and enable
   // Set RX trigger level
