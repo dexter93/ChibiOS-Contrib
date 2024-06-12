@@ -24,7 +24,7 @@
 /*
  * Board identifier.
  */
-#define BOARD_GENERIC_SN32_F240
+#define BOARD_GENERIC_SN32_F280
 #define BOARD_NAME "SN32F280"
 
 /*
