@@ -230,6 +230,7 @@ void	CT16B1_IRQHandler(void)
 			SN_CT16B1->IC = mskCT16_MR11IC;	//Clear MR11 match interrupt status
 		}
 	}
+#if SN32_CT16B1_CHANNELS > 12
 	//MR12
 	if (SN_CT16B1->MCTRL2_b.MR12IE)				//Check if MR12 IE enables?
 	{
@@ -348,6 +349,7 @@ void	CT16B1_IRQHandler(void)
 			SN_CT16B1->IC = mskCT16_MR24IC;	//Clear MR24 match interrupt status
 		}
 	}
+#endif
 #endif
 }
 
