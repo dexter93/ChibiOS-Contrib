@@ -50,6 +50,9 @@ static void initgpio(ioportid_t gpiop, const sn32_gpio_setup_t *config) {
     gpiop->DATA  = config->data;
     gpiop->MODE  = config->mode;
     gpiop->CFG   = config->cfg;
+#if (PAL_IOPORTS_WIDTH > 16U)
+    gpiop->CFG1   = config->cfg1;
+#endif
 }
 
 #if (PAL_USE_WAIT == TRUE) || (PAL_USE_CALLBACKS == TRUE)
@@ -183,7 +186,11 @@ void _pal_lld_setpadmode(ioportid_t port,
         // disable pull up resistor
         // disable Schmitt trigger
         // keep DATA low
-        port->CFG |= (3 << (pad * 2));
+        if(pad < 16U){
+          port->CFG |= (3 << (pad * 2));
+        } else {
+          port->CFG1 |= (3 << ((pad - 16U) * 2));
+        }
         break;
 
     case PAL_MODE_INPUT:
@@ -191,14 +198,22 @@ void _pal_lld_setpadmode(ioportid_t port,
         port->MODE &= ~(1 << pad);
         // disable pull up resistor
         // enable Schmitt trigger
-        port->CFG |= (2 << (pad * 2));
+        if(pad < 16U){
+          port->CFG |= (2 << (pad * 2));
+        } else {
+          port->CFG1 |= (2 << ((pad - 16U) * 2));
+        }
         break;
 
     case PAL_MODE_INPUT_PULLUP:
         //set MODE as INPUT
         port->MODE &= ~(1 << pad);
         //enable pull up resistor
-        port->CFG &= ~(3 << (pad * 2));
+        if(pad < 16U){
+          port->CFG &= ~(3 << (pad * 2));
+        } else {
+          port->CFG1 &= ~(3 << ((pad - 16U) * 2));
+        }
         break;
 
     case PAL_MODE_OUTPUT_PUSHPULL:

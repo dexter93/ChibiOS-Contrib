@@ -54,6 +54,10 @@
  * @name    GPIO ports definitions
  * @{
  */
+#ifndef SN_GPIO0_Type
+  #define SN_GPIO0_Type SN_GPIO1_Type
+#endif
+
 #define GPIOA                         ((SN_GPIO0_Type *)SN_GPIO0_BASE)// SN_GPIO0//
 #define GPIOB                         ((SN_GPIO0_Type *)SN_GPIO1_BASE)// SN_GPIO1//
 #define GPIOC                         ((SN_GPIO0_Type *)SN_GPIO2_BASE)// SN_GPIO2//
@@ -69,8 +73,9 @@
 /**
  * @brief   Width, in bits, of an I/O port.
  */
-#define PAL_IOPORTS_WIDTH 16U
-
+#ifndef PAL_IOPORTS_WIDTH
+  #define PAL_IOPORTS_WIDTH 16U
+#endif
 /**
  * @brief   Whole port mask.
  * @details This macro specifies all the valid bits into a port.
@@ -153,6 +158,10 @@ typedef struct {
   uint32_t              bset;
   /** Initial value for BCLR register.*/
   uint32_t              bclr;
+#if (PAL_IOPORTS_WIDTH > 16U)
+  /** Initial value for CFG1 register.*/
+  uint32_t              cfg1;
+#endif
 } sn32_gpio_setup_t;
 
 /**
