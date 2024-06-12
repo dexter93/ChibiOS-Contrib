@@ -39,6 +39,7 @@
 #elif (defined(SN32F280) || defined(SN32F290))
 #define USB_ENDPOINTS_NUMBER               HAL_MAX_ENDPOINTS
 #define SN32_USB_PMA_SIZE                  512
+#define SN32_USB_DIRECT_SRAM               TRUE
 #else
 #error "USB driver not supported in the selected device"
 #endif
