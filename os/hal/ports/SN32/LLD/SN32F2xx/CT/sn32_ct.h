@@ -44,6 +44,8 @@
 #define SN32_CT16B1_CHANNELS        24
 #elif defined(SN32F260)
 #define SN32_CT16B1_CHANNELS        23
+#elif defined(SN32F290)
+#define SN32_CT16B1_CHANNELS        12
 #else
 #error "CT not supported in the selected device"
 #endif
