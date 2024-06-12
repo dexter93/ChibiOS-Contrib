@@ -213,17 +213,41 @@ void SystemCoreClockUpdate (void)            /* Get Core Clock Frequency      */
 	
 	if (SN_SYS0->AHBCP_b.DIV1P5 == 1)
 		SystemCoreClock = SystemCoreClock*2/3;
+}
+
+/**
+ * Initialize the Flash controller
+ *
+ * @param  none
+ * @return none
+ *
+ * @brief  Update the Flash power control.
+ */
+void FlashClockUpdate (void)
+{
 
 	//;;;;;;;;; Need for SN32F780 Begin	;;;;;;;;;
 	if (SystemCoreClock > 48000000)
 		SN_FLASH->LPCTRL = 0x5AFA0031;
 	else if (SystemCoreClock > 24000000)
 		SN_FLASH->LPCTRL = 0x5AFA0011;
-	else
-		SN_FLASH->LPCTRL = 0x5AFA0000;
+	else  //Slow mode required for SystemCoreClock <= 24000000
+		SlowModeSwitch();
 	//;;;;;;;;; Need for SN32F780 End	;;;;;;;;;
+}
 
-	return;
+/**
+ * Switch System to Slow Mode
+ * @param  none
+ * @return none
+ *
+ * @brief  Special init required for SystemCoreClock <= 24000000
+ */
+void SlowModeSwitch (void)
+{
+	SN_SYS0->CLKCFG_b.SYSCLKSEL = 0; //Switch to IHRC
+	SystemCoreClockUpdate();
+	SN_FLASH->LPCTRL = 0x5AFA0000;
 }
 
 /**

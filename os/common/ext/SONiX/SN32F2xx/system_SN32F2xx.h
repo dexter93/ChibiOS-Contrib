@@ -56,7 +56,7 @@ extern void SystemInit (void);
  *         retrieved from cpu registers.
  */
 extern void SystemCoreClockUpdate (void);
-#if defined(SN32F240B)
+#if defined(SN32F240B) || defined(SN32F290)
 /**
  * Initialize the Flash controller
  *
