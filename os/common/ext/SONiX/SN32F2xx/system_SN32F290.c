@@ -27,7 +27,6 @@
 #include <system_SN32F2xx.h>
 #include <mcuconf.h>
 
-
 /*
 //-------- <<< Use Configuration Wizard in Context Menu >>> ------------------
 */
@@ -170,7 +169,7 @@ uint32_t SystemCoreClock;	/*!< System Clock Frequency (Core Clock)*/
  *----------------------------------------------------------------------------*/
 void SystemCoreClockUpdate (void)            /* Get Core Clock Frequency      */
 {
-	uint32_t AHB_prescaler;
+	uint32_t AHB_prescaler = 0;
 
 	switch (SN_SYS0->CLKCFG_b.SYSCLKST)
 	{
