@@ -90,6 +90,8 @@
 #define mskEP2_CLEAR_DATA0          (0x1<<1)
 #define mskEP3_CLEAR_DATA0          (0x1<<2)
 #define mskEP4_CLEAR_DATA0          (0x1<<3)
+#define mskEP5_CLEAR_DATA0          (0x1<<4)
+#define mskEP6_CLEAR_DATA0          (0x1<<5)
 
 /* USB Endpoint n Buffer Offset Bit Definitions <USB_EPnBUFOS> */
 #define mskEPn_OFFSET               (0x1FF<<0)
